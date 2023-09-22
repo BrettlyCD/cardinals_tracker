@@ -22,7 +22,7 @@ headers = {
 }
 
 #import game list
-
+from game_variables import game_list_22
 
 #setup empty lists to store game data rows
 boxscore_data_list = []
