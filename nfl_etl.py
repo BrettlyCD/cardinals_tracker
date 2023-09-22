@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 import json
 from datetime import datetime
 import s3fs
@@ -28,3 +29,5 @@ from game_variables import game_list_22
 boxscore_data_list = []
 scoring_data_list = []
 
+if __name__ == '__main__':
+    print(game_list_22)
