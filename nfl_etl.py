@@ -7,7 +7,7 @@ from datetime import datetime
 import s3fs
 
 from dotenv import load_dotenv
-from config.functions.py import pandas_game_time_calc
+from config.functions import pandas_game_time_calc
 
 #get API Key and Host
 load_dotenv()
@@ -170,6 +170,11 @@ scoring_dtype_mapping = {
 game_summary = game_summary.astype(summary_dtype_mapping)
 scoring_details = scoring_details.astype(scoring_dtype_mapping)
 
+#convert timestamps
+game_summary['away_time_of_possession'] = pd.to_datetime(game_summary['away_time_of_possession'], format='%M:%S').dt.time
+game_summary['home_time_of_possession'] = pd.to_datetime(game_summary['home_time_of_possession'], format='%M:%S').dt.time
+scoring_details['score_time'] = pd.to_datetime(scoring_details['score_time'], format='%M:%S').dt.time
+
 #calculate elapsed time within the period
 scoring_details['period_elapsed_time'] = np.where(
     scoring_details.score_period == 'OT',
@@ -180,10 +185,7 @@ scoring_details['period_elapsed_time'] = np.where(
 #calculate elapsed time in the game using imported function
 scoring_details['game_elapsed_time'] = scoring_details.apply(pandas_game_time_calc, axis=1)
 
-#convert timestamps
-game_summary['away_time_of_possession'] = pd.to_datetime(game_summary['away_time_of_possession'], format='%M:%S').dt.time
-game_summary['home_time_of_possession'] = pd.to_datetime(game_summary['home_time_of_possession'], format='%M:%S').dt.time
-scoring_details['score_time'] = pd.to_datetime(scoring_details['score_time'], format='%M:%S').dt.time
+#convert timestamps for new fields
 scoring_details['period_elapsed_time'] = pd.to_datetime(scoring_details.period_elapsed_time, unit='s').dt.time
 scoring_details['game_elapsed_time'] = pd.to_datetime(scoring_details.game_elapsed_time, unit='s').dt.time
 
