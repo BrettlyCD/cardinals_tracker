@@ -1,5 +1,5 @@
 #create a custom function to apply
-def game_time_calc(row):
+def pandas_game_time_calc(row):
     """function for pandas dataframe to calculate how much time has passed in the total game using the score time and the period elapsed time"""
     if row['score_period'] == 'OT':
         return (15 * 4 * 60) + row['period_elapsed_time']
@@ -11,3 +11,6 @@ def game_time_calc(row):
             quarter = int(str(row['score_period'])[1])
             
         return ((quarter - 1) * 15 * 60) + row['period_elapsed_time']
+    
+if __name__ == '__main__':
+    pandas_game_time_calc()
