@@ -37,16 +37,16 @@ scoring_data_list = []
 #loop through game list and pull down game data
 for game in game_list_22:
     #setup querystring for API endpoint
-	querystring = {"gameID":"{game_id}".format(game_id=game),"fantasyPoints":"false"}
+    querystring = {"gameID":"{game_id}".format(game_id=game),"fantasyPoints":"false"}
     
     #call using predefined headers and querystring
-	response = requests.get(url, headers=headers, params=querystring)
+    response = requests.get(url, headers=headers, params=querystring)
 
     #drill into json to get to boxscore data
-	boxscore = response.json()['body']
+    boxscore = response.json()['body']
     
-	#create dictionary for game summary
-	game_summary = {
+    #create dictionary for game summary
+    game_summary = {
         "game_id": boxscore['gameID'],
         "game_type": boxscore['seasonType'],
         "game_date_id": boxscore['gameDate'],
@@ -83,37 +83,42 @@ for game in game_list_22:
         "home_result": boxscore['homeResult']
     }
 
-    #lry to access the 'OT' field and set the value if it exists, if not set OT score to 0
-	try:
-		game_summary["away_ot_score"] = boxscore['lineScore']['away']['OT']
-	except KeyError:
-		game_summary["away_ot_score"]=0
+    #try to access the 'OT' field and set the value if it exists, if not set OT score to 0
+    #away score
+    try:
+        game_summary["away_ot_score"] = boxscore['lineScore']['away']['OT']
+    except KeyError:
+        game_summary["away_ot_score"]=0
+    
+    #home score
+    try:
+        game_summary["home_ot_score"] = boxscore['lineScore']['home']['OT']
+    except KeyError:
+        game_summary["home_ot_score"]=0
+        
+    #append to the boxscore data list
+    boxscore_data_list.append(game_summary)   
+        
+    #loop through scoring events in each game
+    for score in boxscore['scoringPlays']:
+        #use mapping to get score period into correct format
+        score_period = period_mapping.get(score['scorePeriod'], score['scorePeriod'])
 
-	try:
-		game_summary["home_ot_score"] = boxscore['lineScore']['home']['OT']
-	except KeyError:
-		game_summary["home_ot_score"]=0
-        
-	#append to the boxscore data list
-	boxscore_data_list.append(game_summary)   
-        
-	#loop through scoring events in each game
-	for score in boxscore['scoringPlays']:
-            #create dictionary for scoring details
-		score_detail = {
+        #create dictionary for scoring details
+        score_detail = {
             "game_id": game,
             "team_id": score['teamID'],
             "score_type": score['scoreType'],
-            "score_period": score['scorePeriod'],
+            "score_period": score_period,
             "score_time": score['scoreTime'],
             "drive_detail": score['scoreDetails'],
             "score_detail": score['score'],
             "away_team_score": score['awayScore'],
             "home_team_score": score['homeScore']
         }	
-    
-		#append to the scoring data list
-		scoring_data_list.append(score_detail)
+
+        #append to the scoring data list
+        scoring_data_list.append(score_detail)
 
 #convert lists into pandas dataframes
 game_summary = pd.DataFrame(boxscore_data_list)
