@@ -23,8 +23,11 @@ headers = {
 	"X-RapidAPI-Host": "{host}".format(host=api_host)
 }
 
+#import mappings for naming and datatypes
+from config.mappings import period_mapping, summary_dtype_mapping, scoring_dtype_mapping
+
 #import game list
-from game_variables import game_list_22
+from config.game_variables import game_list_22
 
 #setup empty lists to store game data rows
 boxscore_data_list = []
@@ -115,56 +118,6 @@ for game in game_list_22:
 #convert lists into pandas dataframes
 game_summary = pd.DataFrame(boxscore_data_list)
 scoring_details = pd.DataFrame(scoring_data_list)
-
-#set mappings for datatypes
-summary_dtype_mapping = {
-    'game_id': 'object',
-    'game_type': 'object',
-    'game_date_id': 'object',
-    'game_location': 'object',
-    'away_team_id': 'object',
-    'away_team': 'object',
-    'away_q1_score': 'int64',
-    'away_q2_score': 'int64',
-    'away_q3_score': 'int64',
-    'away_q4_score': 'int64',
-    'away_ot_score': 'int64',
-    'away_total_score': 'int64',
-    'away_total_plays': 'int64',
-    'away_total_yards': 'int64',
-    'away_passing_yards': 'int64',
-    'away_rushing_yards': 'int64',
-    'away_turnovers': 'int64',
-    'away_time_of_possession': 'object',  # Update to datetime after mapping
-    'away_result': 'object',
-    'home_team_id': 'object',
-    'home_team': 'object',
-    'home_q1_score': 'int64',
-    'home_q2_score': 'int64',
-    'home_q3_score': 'int64',
-    'home_q4_score': 'int64',
-    'home_ot_score': 'int64',
-    'home_total_score': 'int64',
-    'home_total_plays': 'int64',
-    'home_total_yards': 'int64',
-    'home_passing_yards': 'int64',
-    'home_rushing_yards': 'int64',
-    'home_turnovers': 'int64',
-    'home_time_of_possession': 'object',  # Update to datetime after mapping
-    'away_result': 'object',
-    'home_result': 'object',
-}
-
-scoring_dtype_mapping = {
-    'team_id': 'object',
-    'score_type': 'category',  # Make score_type categorical
-    'score_period': 'object',
-    'score_time': 'object',  # convert to datetime in nextsteyp
-    'drive_detail': 'object',
-    'score_detail': 'object',
-    'away_team_score': 'int64',
-    'home_team_score': 'int64',
-}
 
 #map new datatypes
 game_summary = game_summary.astype(summary_dtype_mapping)
