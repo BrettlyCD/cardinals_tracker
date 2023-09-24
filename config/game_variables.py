@@ -1,7 +1,7 @@
 #ids of all Cardies games in 2022
 
 game_list_22 = [
-    '20220911_KC@ARI',
+    #'20220911_KC@ARI',
     '20220918_ARI@LV',
     # '20220925_LAR@ARI',
     # '20221002_ARI@CAR',
