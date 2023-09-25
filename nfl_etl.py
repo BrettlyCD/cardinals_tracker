@@ -149,3 +149,7 @@ def run_nfl_etl():
     #convert timestamps for new fields
     scoring_details['period_elapsed_time'] = pd.to_datetime(scoring_details.period_elapsed_time, unit='s').dt.time
     scoring_details['game_elapsed_time'] = pd.to_datetime(scoring_details.game_elapsed_time, unit='s').dt.time
+
+    #save dataframes to S3
+    game_summary.to_csv('s3://nfl-etl-project-brett/cardinals_game_summary_data.csv')
+    scoring_details.to_csv('s3://nfl-etl-project-brett/cardinals_game_scoring_details.csv')
