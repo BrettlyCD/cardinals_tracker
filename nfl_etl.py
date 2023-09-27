@@ -153,3 +153,6 @@ def run_nfl_etl():
     #save dataframes to S3
     game_summary.to_csv('s3://nfl-etl-project-brett/cardinals_game_summary_data.csv')
     scoring_details.to_csv('s3://nfl-etl-project-brett/cardinals_game_scoring_details.csv')
+
+if __name__ == '__main__':
+    run_nfl_etl()
