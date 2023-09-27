@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from airflow import DAG
-from airflow.operators.pythonOperator import PythonOperator
+from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 
 from nfl_etl import run_nfl_etl
@@ -21,7 +21,7 @@ default_args = {
 }
 
 dag = DAG(
-    'tutorial',
+    'NFL_ETL',
     default_args=default_args,
     description='Cardinals etl code'
 )
