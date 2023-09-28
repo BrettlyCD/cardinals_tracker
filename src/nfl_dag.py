@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 
-from nfl_etl import run_nfl_etl
+from src.game_stats_score_etl import run_nfl_etl
 
 default_args = {
     'owner': 'airflow',
