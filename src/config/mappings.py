@@ -75,3 +75,14 @@ team_dtype_mapping = {
     'team_abrv': 'object',
     'team_logo_link': 'object'
 }
+
+#schedule data type mappings
+schedule_dtype_mapping = {
+    'game_id': 'object',
+    'team_id': 'int64',
+    'game_type_id': 'int64',
+    'season': 'int64', 
+    'game_week': 'object',
+    'is_home_team_flag': 'int64',
+    'is_complete_flag': 'int64'
+}
