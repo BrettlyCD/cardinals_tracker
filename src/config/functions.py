@@ -1,4 +1,5 @@
-#create a custom function to apply
+### File to store functions for importing to other files and using
+
 def pandas_game_time_calc(row):
     """function for pandas dataframe to calculate how much time has passed in the total game using the score time and the period elapsed time"""
     if row['score_period'] == 'OT':
