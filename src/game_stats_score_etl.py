@@ -67,28 +67,21 @@ def transform_boxscore_data(boxscore_responses):
 
     #loop through API responses to populate data
     for boxscore in boxscore_responses:
+
+        #set home team win flag value
+        if boxscore['homeResult'] == 'W':
+            home_win_flag = 1
+        else:
+            home_win_flag = 0
+
         game_summary = {
             "game_id": boxscore['gameID'],
-            "game_type": boxscore['seasonType'],
-            "game_date_id": boxscore['gameDate'],
-            "game_location": boxscore['gameLocation'],
-            "away_team_id": boxscore['lineScore']['away']['teamID'],
-            "away_team": boxscore['away'],
-            "away_q1_score": boxscore['lineScore']['away']['Q1'],
-            "away_q2_score": boxscore['lineScore']['away']['Q2'],
-            "away_q3_score": boxscore['lineScore']['away']['Q3'],
-            "away_q4_score": boxscore['lineScore']['away']['Q4'],
-            "away_ot_score": '', #leave as blank for now to fill in the next step
-            "away_total_score": boxscore['lineScore']['away']['totalPts'],
-            "away_total_plays": boxscore['teamStats']['away']['totalPlays'],
-            "away_total_yards": boxscore['teamStats']['away']['totalYards'],
-            "away_passing_yards": boxscore['teamStats']['away']['passingYards'],
-            "away_rushing_yards": boxscore['teamStats']['away']['rushingYards'],
-            "away_turnovers": boxscore['teamStats']['away']['turnovers'],
-            "away_time_of_possession": boxscore['teamStats']['away']['possession'],
-            "away_result": boxscore['awayResult'],
             "home_team_id": boxscore['lineScore']['home']['teamID'],
-            "home_team": boxscore['home'],
+            "away_team_id": boxscore['lineScore']['away']['teamID'],
+            # "game_type": boxscore['seasonType'],
+            # "game_date_id": boxscore['gameDate'],
+            # "game_location": boxscore['gameLocation'],
+            # "away_team": boxscore['away'],
             "home_q1_score": boxscore['lineScore']['home']['Q1'],
             "home_q2_score": boxscore['lineScore']['home']['Q2'],
             "home_q3_score": boxscore['lineScore']['home']['Q3'],
@@ -101,7 +94,22 @@ def transform_boxscore_data(boxscore_responses):
             "home_rushing_yards": boxscore['teamStats']['home']['rushingYards'],
             "home_turnovers": boxscore['teamStats']['home']['turnovers'],
             "home_time_of_possession": boxscore['teamStats']['home']['possession'],
-            "home_result": boxscore['homeResult']
+            "away_q1_score": boxscore['lineScore']['away']['Q1'],
+            "away_q2_score": boxscore['lineScore']['away']['Q2'],
+            "away_q3_score": boxscore['lineScore']['away']['Q3'],
+            "away_q4_score": boxscore['lineScore']['away']['Q4'],
+            "away_ot_score": '', #leave as blank for now to fill in the next step
+            "away_total_score": boxscore['lineScore']['away']['totalPts'],
+            "away_total_plays": boxscore['teamStats']['away']['totalPlays'],
+            "away_total_yards": boxscore['teamStats']['away']['totalYards'],
+            "away_passing_yards": boxscore['teamStats']['away']['passingYards'],
+            "away_rushing_yards": boxscore['teamStats']['away']['rushingYards'],
+            "away_turnovers": boxscore['teamStats']['away']['turnovers'],
+            "away_time_of_possession": boxscore['teamStats']['away']['possession'],
+            "home_team_win_flag": home_win_flag
+            # "away_result": boxscore['awayResult'],
+            # "home_team": boxscore['home'],
+            # "home_result": boxscore['homeResult']
         }
 
         #try to access the 'OT' field and set the value if it exists, if not set OT score to 0
