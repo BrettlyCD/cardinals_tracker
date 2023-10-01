@@ -66,3 +66,12 @@ static_dim_dtype_mapping = {
     'ID': 'int64',
     'label': 'object'
 }
+
+#team data type mappings
+team_dtype_mapping = {
+    'team_id': 'int64',
+    'team_name_location': 'object',
+    'team_name': 'object',
+    'team_abrv': 'object',
+    'team_logo_link': 'object'
+}
