@@ -45,14 +45,13 @@ def get_team_data():
 
     return teams
 
-#def transform_team_data(teams_json):
-
-
+def transform_team_data(teams_json):
+    """Transform Teams API response into a useable dataframe"""
     #setup empty list for saving team records
     team_list = []
 
     #loop through each te am and save data
-    for team in teams:
+    for team in teams_json:
         team_info = {
             'team_id': team['teamID'],
             'team_name_location': team['teamCity'],
@@ -79,30 +78,3 @@ def get_team_data():
 # score_type_df.to_csv('../data/Exports/dim_score_type.csv')
 # sportsbook_df.to_csv('../data/Exports/dim_sportsbook.csv')
 # game_type_df.to_csv('../data/Exports/dim_game_type.csv')
-
-### Team Data
-team_response = requests.get(team_endpoint, headers=headers, params=team_querystring)
-
-#drill into body of response
-teams = team_response.json()['body']
-
-#setup empty list for saving team records
-team_list = []
-
-#loop through each te am and save data
-for team in teams:
-    team_info = {
-        'team_id': team['teamID'],
-        'team_name_location': team['teamCity'],
-        'team_name': team['teamName'],
-        'team_abrv': team['teamAbv'],
-        'team_logo_link': team['nflComLogo1']
-    }
-
-    team_list.append(team_info)
-
-#convert list into dataframe
-teams_df = pd.DataFrame(team_list)
-
-#change datatypes
-teams_df = teams_df.astype(team_dtype_mapping)
