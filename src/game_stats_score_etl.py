@@ -8,6 +8,7 @@ import s3fs
 
 from dotenv import load_dotenv
 from config.functions import pandas_game_time_calc
+from config.dim_tables_static import score_type_dict
 
 #get API Key and Host
 load_dotenv()
@@ -149,14 +150,15 @@ def transform_scoring_data(scoring_responses):
         
     #loop through scoring events in each boxscore isntance ("game")
     for score in scoring_responses:
-        #use mapping to get score period into correct format
+        #use mapping to get score period and score_type_id into correct format
         score_period = period_mapping.get(score[1]['scorePeriod'], score[1]['scorePeriod']) #have to add the 1 index to pull the score details, 0 is the game ID
+        score_type_id = score_type_dict.get(score[1]['scoreType'], '') #get the ID of the score type or blank if not exists
 
         #create dictionary for scoring details
         score_detail = {
             "game_id": score[0],
             "team_id": score[1]['teamID'],
-            "score_type": score[1]['scoreType'],
+            "score_type_id": score_type_id,
             "score_period": score_period,
             "score_time": score[1]['scoreTime'],
             "drive_detail": score[1]['scoreDetails'],
