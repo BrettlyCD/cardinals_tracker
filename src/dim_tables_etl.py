@@ -90,7 +90,7 @@ def get_schedule_data(team_list, season):
         schedule = schedule_response['schedule']
 
         #combine these variables and append to our extract list
-        schedule_extract_list.append([team, schedule])
+        schedule_extract_list.append([team, season, schedule])
 
     return schedule_extract_list
 
@@ -101,10 +101,11 @@ def transform_schedule_data(schedule_extract_list):
     schedule_data_list = []
 
     for team in schedule_extract_list:
-        #set team value
+        #set team and season value
         team = team[0] #take the first item in the sublist
+        season = team[1] #take the second item in the sublist
         #now loop through each game
-        for game in team[1]: #take the second item in the sublist
+        for game in team[2]: #take the third item in the sublist
             #create dictionary for team data
             if game['home'] == team:
                 schedule_info = {
