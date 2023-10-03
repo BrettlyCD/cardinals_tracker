@@ -105,7 +105,7 @@ game_dtype_mapping = {
 #betting data type mappings
 betting_dtype_mapping = {
     "game_id": 'object',
-    "last_update": 'object',  # Update to datetime after mapping
+    "last_update": 'float',  # Update to datetime after mapping
     "sportsbook_id": 'int64', 
     "total_over_under": 'int64',
     "over_odds": 'object',
