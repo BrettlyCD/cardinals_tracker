@@ -141,8 +141,6 @@ def transform_boxscore_data(boxscore_responses):
 
     return boxcore_df
 
-
-
 def transform_scoring_data(scoring_responses):
     """Take lists from boxscore api responses and process the data into a useable dataframe"""
     #setup empty list to store scoring data rows
