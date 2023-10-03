@@ -6,7 +6,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from config.dim_tables_static import sportsbook_dict
-from config.mappings import betting_dtype_mapping
+from config.mappings import betting_dtype_mapping, record_dtype_mapping
 
 #get API Key and Host
 load_dotenv()
@@ -21,6 +21,10 @@ headers = {
 
 #set API endpoints
 betting_endpoint = 'https://tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com/getNFLBettingOdds'
+record_endpoint = 'https://tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com/getNFLTeams'
+
+#set static querystring
+record_querystring = {'rosters':'false','schedules':'false','topPerformers':'false','teamStats':'false'}
 
 def get_betting_data(game_list):
     """Loop through list of games and get data from Rapid API"""
@@ -94,3 +98,48 @@ def transform_betting_data(betting_extract_list, sportsbook_mapping):
     #do i need to update last_update to timestamp? currently float type
 
     return betting_df
+
+def get_record_data():
+    """Pull dimensional team data from Rapid API that contains team and record data"""
+
+    ### Team Data
+    record_response = requests.get(record_endpoint, headers=headers, params=record_querystring)
+
+    #drill into body of response
+    records = record_response.json()['body']
+
+    return records
+
+def transform_record_data(records_json, season):
+    """Take exported json from get_record_data and the current season and transform into usebale dataframe"""
+
+    #set empty list to save record data
+    record_data_list = []
+
+    #set current timestamp as variable
+    refresh_timestamp = datetime.now()
+
+    #loop through each record to save data for each team
+    for team in records_json:
+        record_dict = {
+            'team_id': team['teamID'],
+            'updated_datetime': refresh_timestamp,
+            'season': season,
+            'wins': team['wins'],
+            'loses': team['loss'],
+            'ties': team['tie'],
+            'points_for': team['pf'],
+            'points_against': team['pa']
+        }
+
+        record_data_list.append(record_dict)
+    
+    #convert list into dataframe
+    record_df = pd.DataFrame(record_df)
+
+    #change datatypes
+    record_df = record_df.astype(record_dtype_mapping)
+
+    #do i need to update last_update to timestamp? currently float type
+
+    return record_df
