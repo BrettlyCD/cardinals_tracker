@@ -86,3 +86,18 @@ schedule_dtype_mapping = {
     'is_home_team_flag': 'int64',
     'is_complete_flag': 'int64'
 }
+
+#game data type mappings
+game_dtype_mapping = {
+    "game_id": 'object',
+    "game_date_id": 'int64',
+    "game_type_id": 'int64',
+    "home_team_id": 'int64',
+    "away_team_id": 'int64',
+    "game_start_time": 'object',
+    "game_location": 'object',
+    "game_arena": 'object',
+    "is_neautral_site_flag": 'int64',
+    "espn_link": 'object',
+    "cbs_link": 'object'
+}
