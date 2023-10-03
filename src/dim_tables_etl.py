@@ -71,11 +71,11 @@ def transform_team_data(teams_json):
 
     return teams_df
 
-def get_transform_schedule_data(team_list, season):
-    """Pull Schedule data from Rapid API, using dynamic team list to pull for multiple teams.
-    Going to combine extract and transform here for simplicity do to the nesting of the data. At least for now."""
+def get_schedule_data(team_list, season):
+    """Pull Schedule data from Rapid API, using dynamic team list to pull for multiple teams."""
+    
     #setup empty lsit for saving schedule data
-    schedule_data_list = []
+    schedule_extract_list = []
 
     #loop through each team and save data
     for team in team_list:
@@ -89,38 +89,53 @@ def get_transform_schedule_data(team_list, season):
         team = schedule_response['team'] #use this flag if team is home team
         schedule = schedule_response['schedule']
 
-        #create dictionary for for each game in the schedule
-        for game in schedule:
+        #combine these variables and append to our extract list
+        schedule_extract_list.append([team, schedule])
+
+    return schedule_extract_list
+
+def transform_schedule_data(schedule_extract_list):
+    """Take the output of our get_schedule_data function and transform into a useable dataframe"""   
+
+    #setup empty list to store schedule data
+    schedule_data_list = []
+
+    for team in schedule_extract_list:
+        #set team value
+        team = team[0] #take the first item in the sublist
+        #now loop through each game
+        for game in team[1]: #take the second item in the sublist
+            #create dictionary for team data
             if game['home'] == team:
                 schedule_info = {
-                    'game_id': game['gameID'],
-                    'team_id': game['teamIDHome'],
-                    'game_type_id': game_type_dict.get(game['seasonType'], ""),
-                    'season': season, 
-                    'game_week': game['gameWeek'],
-                    'is_home_team_flag': 1,
-                    'is_complete_flag': 1
+                    "game_id": game['gameID'],
+                    "team_id": game['teamIDHome'],
+                    "game_type_id": game_type_dict.get(game['seasonType'], ""),
+                    "season": season, #can I find a way to automate this?
+                    "game_week": game['gameWeek'],
+                    "is_home_team_flag": 1,
+                    "is_complete_flag": 1
                 }
             else:
                 schedule_info = {
-                    'game_id': game['gameID'],
-                    'team_id': game['teamIDHome'],
-                    'game_type_id': game_type_dict.get(game['seasonType'], ""),
-                    'season': season, 
-                    'game_week': game['gameWeek'],
-                    'is_home_team_flag': 0,
-                    'is_complete_flag': 1
+                    "game_id": game['gameID'],
+                    "team_id": game['teamIDAway'],
+                    "game_type_id": game_type_dict.get(game['seasonType'], ""),
+                    "season": season, #can I find a way to automate this?
+                    "game_week": game['gameWeek'],
+                    "is_home_team_flag": 0,
+                    "is_complete_flag": 1
                 }
-            
+        
             schedule_data_list.append(schedule_info)
 
-        #convert list into dataframe
-        schedule_df = pd.DataFrame(schedule_data_list)
+    #convert list into dataframe
+    schedule_df = pd.DataFrame(schedule_data_list)
 
-        #change datatypes
-        schedule_df = schedule_df.astype(schedule_dtype_mapping)
+    #change datatypes
+    schedule_df = schedule_df.astype(schedule_dtype_mapping)
 
-        return schedule_df
+    return schedule_df
 
 
 
