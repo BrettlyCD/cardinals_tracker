@@ -5,7 +5,7 @@ import requests
 
 from dotenv import load_dotenv
 from config.dim_tables_static import score_type_dict, sportsbook_dict, game_type_dict #import static dimension data for database update
-from config.mappings import static_dim_dtype_mapping, team_dtype_mapping, schedule_dtype_mapping
+from config.mappings import static_dim_dtype_mapping, team_dtype_mapping, schedule_dtype_mapping, game_dtype_mapping
 
 #get API Key and Host
 load_dotenv()
@@ -21,12 +21,14 @@ headers = {
 #set API endpoints
 team_endpoint = 'https://tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com/getNFLTeams'
 schedule_endpoint = 'https://tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com/getNFLTeamSchedule'
+game_endpoint = 'https://tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapidapi.com/getNFLGameInfo'
 
 #set static API querystrings - I'll set dynamic endpoints in the functions themselves
 team_querystring = {'rosters':'false','schedules':'false','topPerformers':'false','teamStats':'false'}
 
 def create_dim_dataframe(dim_dict):
     """Convert input dictionary for static table into a pandas dataframe"""
+
     #Convert imported dictionary into a pandas dataframe
     df = pd.DataFrame(dim_dict.items(), columns=[['label', 'ID']])
     #Reorder to put ID first
@@ -38,6 +40,7 @@ def create_dim_dataframe(dim_dict):
 
 def get_team_data():
     """Pull dimensional team data from Rapid API"""
+
     ### Team Data
     team_response = requests.get(team_endpoint, headers=headers, params=team_querystring)
 
@@ -48,6 +51,7 @@ def get_team_data():
 
 def transform_team_data(teams_json):
     """Transform Teams API response into a useable dataframe"""
+
     #setup empty list for saving team records
     team_data_list = []
 
@@ -138,7 +142,85 @@ def transform_schedule_data(schedule_extract_list):
 
     return schedule_df
 
+def get_game_data(game_list):
+    """Take a list of game_ids as input and pull the game data from the Rapid API"""
 
+    #setup empty list to store API responses
+    game_extract_list = []
+
+    #loop through game list and call API
+    for game_id in game_list:
+
+        #set querystring
+        game_querystring = {"gameID":"{game_id}".format(game_id=game_id)}
+
+        #call API
+        game_response = requests.get(game_endpoint, headers=headers, params=game_querystring)
+
+        #drill into body of response
+        game_data = game_response.json()['body']
+
+        #add data to extract list
+        game_extract_list.append(game_data)
+
+    return game_extract_list
+
+def transform_game_data(game_extract_list):
+    """Take the output of our get_game_data function and transform into useable dataframe."""
+
+    #setup empty list to store data
+    game_data_list = []
+
+    #read in game location data from persist_variables.json
+    with open('../data/persist_variables.json', 'r') as f:
+        location_data = json.load(f)
+
+    #loop through extracted game list
+    for game in game_extract_list:
+
+        #flag if the game is on a neutral site
+        if game['neutralSite'] == 'True':
+            neutral_site_flag = 1
+        else:
+            neutral_site_flag = 0
+
+        #map game type - from our game_type_dict
+        game_type_id = game_type_dict.get(game['seasonType'], game['seasonType'])
+
+        #map location data from read in json file if possible
+        for i in location_data['location_data']: #iterate through each record in json
+            if i['game_id'] == game['gameID']: #check if any records match the game we're on in the extract list
+                location = i['game_location']
+                arena = i['game_arena']
+                break
+            else: #else save as blank variables we'll have to fill in later.
+                location = ''
+                arena = ''
+
+        #create dictionary for team data
+        game_info = {
+            "game_id": game['gameID'],
+            "game_date_id": game['gameDate'],
+            "game_type_id": game_type_id,
+            "home_team_id": game['teamIDHome'],
+            "away_team_id": game['teamIDAway'],
+            "game_start_time": game['gameTime'],
+            "game_location": location,
+            "game_arena": arena,
+            "is_neautral_site_flag": neutral_site_flag,
+            "espn_link": game['espnLink'],
+            "cbs_link": game['cbsLink']
+        }
+            
+        game_data_list.append(game_info)
+
+    #convert list into dataframe
+    game_df = pd.DataFrame(game_data_list)
+
+    #change datatypes
+    game_df = game_df.astype(game_dtype_mapping)
+
+    return game_df
 
 ###export dataframes for storage
 # score_type_df = create_dim_dataframe(score_type_dict)
