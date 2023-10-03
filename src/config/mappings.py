@@ -101,3 +101,19 @@ game_dtype_mapping = {
     "espn_link": 'object',
     "cbs_link": 'object'
 }
+
+#betting data type mappings
+betting_dtype_mapping = {
+    "game_id": 'object',
+    "last_update": 'object',  # Update to datetime after mapping
+    "sportsbook_id": 'int64', 
+    "total_over_under": 'int64',
+    "over_odds": 'object',
+    "under_odds": 'object',
+    "home_spread": 'object',
+    "home_odds": 'object',
+    "away_spread": 'object',
+    "away_odds": 'object',
+    "home_ml_odds": 'object',
+    "away_ml_odds": 'object'
+} 
