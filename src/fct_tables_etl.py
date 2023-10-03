@@ -15,8 +15,8 @@ api_host = os.getenv('rapid_api_host')
 
 #set API headers
 headers = {
-	"X-RapidAPI-Key": "{key}".format(key=api_token),
-	"X-RapidAPI-Host": "{host}".format(host=api_host)
+	'X-RapidAPI-Key': '{key}'.format(key=api_token),
+	'X-RapidAPI-Host': '{host}'.format(host=api_host)
 }
 
 #set API endpoints
@@ -70,18 +70,18 @@ def transform_betting_data(betting_extract_list, sportsbook_mapping):
 
                 #create dictionary to append to list
                 betting_odds = {
-                    "game_id": game_id,
-                    "last_update": updated_time,
-                    "sportsbook_id": value, #value is the sportsbook ID
-                    "total_over_under": sportsbook_data['totalOver'],
-                    "over_odds": sportsbook_data['totalOverOdds'],
-                    "under_odds": sportsbook_data['totalUnderOdds'],
-                    "home_spread": sportsbook_data['homeTeamSpread'],
-                    "home_odds": sportsbook_data['homeTeamSpreadOdds'],
-                    "away_spread": sportsbook_data['awayTeamSpread'],
-                    "away_odds": sportsbook_data['awayTeamSpreadOdds'],
-                    "home_ml_odds": sportsbook_data['homeTeamMLOdds'],
-                    "away_ml_odds": sportsbook_data['awayTeamMLOdds']
+                    'game_id': game_id,
+                    'last_update': updated_time,
+                    'sportsbook_id': value, #value is the sportsbook ID
+                    'total_over_under': sportsbook_data['totalOver'],
+                    'over_odds': sportsbook_data['totalOverOdds'],
+                    'under_odds': sportsbook_data['totalUnderOdds'],
+                    'home_spread': sportsbook_data['homeTeamSpread'],
+                    'home_odds': sportsbook_data['homeTeamSpreadOdds'],
+                    'away_spread': sportsbook_data['awayTeamSpread'],
+                    'away_odds': sportsbook_data['awayTeamSpreadOdds'],
+                    'home_ml_odds': sportsbook_data['homeTeamMLOdds'],
+                    'away_ml_odds': sportsbook_data['awayTeamMLOdds']
                 }
 
                 betting_data_list.append(betting_odds)
