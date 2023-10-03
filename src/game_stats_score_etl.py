@@ -32,14 +32,14 @@ from config.game_variables import game_list_22
 
 ###API PULLS###
 #define steps into multiple functions
-def get_game_data():
+def get_game_data(game_list):
     """Pull data from NFL Rapid API and save to lists for transformation"""
     #setup empty lists to store json data
     boxscore_responses = []
     scoring_responses = []
 
     #loop through game list and pull down game data
-    for game in game_list_22:
+    for game in game_list:
         #setup querystring for API endpoint
         querystring = {"gameID":"{game_id}".format(game_id=game),"fantasyPoints":"false"}
         
