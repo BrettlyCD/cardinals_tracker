@@ -117,3 +117,15 @@ betting_dtype_mapping = {
     "home_ml_odds": 'object',
     "away_ml_odds": 'object'
 } 
+
+#record data type mappings
+record_dtype_mapping = {
+    'team_id': 'int64',
+    'updated_datetime': 'object',
+    'season': 'int64',
+    'wins': 'int64',
+    'loses': 'int64',
+    'ties': 'int64',
+    'points_for': 'int64',
+    'points_against': 'int64'
+}
