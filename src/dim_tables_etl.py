@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 from config.dim_tables_static import score_type_dict, sportsbook_dict, game_type_dict #import static dimension data for database update
 from config.mappings import static_dim_dtype_mapping, team_dtype_mapping, schedule_dtype_mapping, game_dtype_mapping
 
+#import team sample to use for tests
+from config.api_variables import team_sample
+
 #get API Key and Host
 load_dotenv()
 api_token = os.getenv('nfl_api_key')
@@ -90,8 +93,8 @@ def get_schedule_data(team_list, season):
         schedule_response = requests.get(schedule_endpoint, headers=headers, params=schedule_querystring)
 
         #drill to team and schedule 
-        team = schedule_response['team'] #use this flag if team is home team
-        schedule = schedule_response['schedule']
+        team = schedule_response.json()['body']['team'] #use this flag if team is home team
+        schedule = schedule_response.json()['body']['schedule']
 
         #combine these variables and append to our extract list
         schedule_extract_list.append([team, season, schedule])
@@ -104,12 +107,12 @@ def transform_schedule_data(schedule_extract_list):
     #setup empty list to store schedule data
     schedule_data_list = []
 
-    for team in schedule_extract_list:
+    for item in schedule_extract_list:
         #set team and season value
-        team = team[0] #take the first item in the sublist
-        season = team[1] #take the second item in the sublist
+        team = item[0] #take the first item in the sublist
+        season = item[1] #take the second item in the sublist
         #now loop through each game
-        for game in team[2]: #take the third item in the sublist
+        for game in item[2]: #take the third item in the sublist
             #create dictionary for team data
             if game['home'] == team:
                 schedule_info = {
@@ -231,3 +234,10 @@ def transform_game_data(game_extract_list):
 # sportsbook_df.to_csv('../data/Exports/dim_sportsbook.csv')
 # game_type_df.to_csv('../data/Exports/dim_game_type.csv')
 
+#test team data ETL to simple csv
+# teams_json = get_team_data()
+# teams_df = transform_team_data(teams_json)
+# teams_df.to_csv('../data/Exports/dim_team.csv')
+
+#test schedule data ETL to simple csv
+# git stat
