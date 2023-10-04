@@ -61,6 +61,27 @@ def get_game_data(game_list):
 
     return boxscore_responses, scoring_responses
 
+def save_game_location(boxscore_responses, json_path):
+    """Take list from boxscore api response and save the game location data to persist_variables.json"""
+
+    #read in json
+    with open(json_path, 'w') as f:
+        data = json.load(f)
+
+    #for each boxscore record, append the location data to our loaded data
+    for boxscore in boxscore_responses:
+        game_location = {
+            "game_id": boxscore['gameID'],
+            "game_location": boxscore['gameLocation'],
+            "game_arena": boxscore['arena']
+        }
+        data['location_data'].append(game_location)
+
+    #re-save json file
+    with open(json_path, 'w') as f:
+        json.dump(data, f)
+    
+
 def transform_boxscore_data(boxscore_responses):
     """Take lists from boxscore api responses and process the data into a useable dataframe"""
     #setup empty lists to store game data rows
