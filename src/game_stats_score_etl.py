@@ -28,7 +28,7 @@ headers = {
 from config.mappings import period_mapping, summary_dtype_mapping, scoring_dtype_mapping
 
 #import game list
-from config.game_variables import game_list_22
+from config.api_variables import game_list_22
 
 ###API PULLS###
 #define steps into multiple functions
