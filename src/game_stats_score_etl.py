@@ -28,7 +28,7 @@ headers = {
 from config.mappings import period_mapping, summary_dtype_mapping, scoring_dtype_mapping
 
 #import game list
-from config.api_variables import game_list_22
+from config.api_variables import game_sample
 
 ###API PULLS###
 #define steps into multiple functions
@@ -80,7 +80,6 @@ def save_game_location(boxscore_responses, json_path):
     #re-save json file
     with open(json_path, 'w') as f:
         json.dump(data, f)
-    
 
 def transform_boxscore_data(boxscore_responses):
     """Take lists from boxscore api responses and process the data into a useable dataframe"""
@@ -217,13 +216,3 @@ def transform_scoring_data(scoring_responses):
 #save dataframes to S3
 #game_summary.to_csv('s3://nfl-etl-project-brett/cardinals_game_summary_data.csv')
 #scoring_details.to_csv('s3://nfl-etl-project-brett/cardinals_game_scoring_details.csv')
-
-if __name__ == '__main__':
-    boxscore_api, scoring_api = get_game_data()
-
-    boxscore = transform_boxscore_data(boxscore_responses=boxscore_api)
-    scoring = transform_scoring_data(scoring_responses=scoring_api)
-
-    print(boxscore.head())
-    print('\n------------------------------------------\n')
-    print(scoring.head())
