@@ -8,7 +8,7 @@ from config.dim_tables_static import score_type_dict, sportsbook_dict, game_type
 from config.mappings import static_dim_dtype_mapping, team_dtype_mapping, schedule_dtype_mapping, game_dtype_mapping
 
 #import team sample to use for tests
-from config.api_variables import team_sample
+from config.api_variables import team_sample, game_sample
 
 #get API Key and Host
 load_dotenv()
@@ -240,4 +240,11 @@ def transform_game_data(game_extract_list):
 # teams_df.to_csv('../data/Exports/dim_team.csv')
 
 #test schedule data ETL to simple csv
-# git stat
+# schedule_extract = get_schedule_data(team_sample, 2022)
+# schedule_df = transform_schedule_data(schedule_extract)
+# schedule_df.to_csv('../data/Exports/dim_schedule.csv')
+
+# #test game data now that we have some location data saved
+# game_extract = get_game_data(game_sample)
+# game_df = transform_game_data(game_extract)
+# game_df.to_csv('../data/Exports/dim_game.csv')
