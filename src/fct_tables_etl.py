@@ -7,6 +7,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from config.dim_tables_static import sportsbook_dict
 from config.mappings import betting_dtype_mapping, record_dtype_mapping
+from config.api_variables import game_sample_23
 
 #get API Key and Host
 load_dotenv()
@@ -143,3 +144,8 @@ def transform_record_data(records_json, season):
     #do i need to update last_update to timestamp? currently float type
 
     return record_df
+
+#test betting data
+# betting_extract = get_betting_data(game_sample_23)
+# betting_df = transform_betting_data(betting_extract, sportsbook_dict)
+# betting_df.to_csv('../data/Exports/fct_betting.csv')
