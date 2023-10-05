@@ -20,6 +20,11 @@ game_sample = [
     # '20230108_ARI@SF',
 ]
 
+game_sample_23 = [
+    '20230924_DAL@ARI',
+    '20231001_ARI@SF'
+]
+
 team_sample = [
     '1',
     '3',
