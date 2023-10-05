@@ -95,24 +95,6 @@ def save_game_location(boxscore_responses, json_path):
 
             #add the game id to our set
             existing_game_ids.add(game_id)
-        
-        
-        # #loop through each record in game_location and pass if already exists
-        # print(boxscore['gameID'])
-        # for i in data['location_data']:
-        #     print(i['game_id'])
-        #     if i['game_id'] == boxscore['gameID']:
-        #         break
-        #     else:
-        #         #else append the location data to our loaded data
-        #         game_location = {
-        #             "game_id": boxscore['gameID'],
-        #             "game_location": boxscore['gameLocation'],
-        #             "game_arena": boxscore['arena']
-        #         }
-        #         print(game_location)
-        #         data['location_data'].append(game_location)
-        #         print(data['location_data'])
 
     #re-save json file
     with open(json_path, 'w') as f:
@@ -254,5 +236,6 @@ def transform_scoring_data(scoring_responses):
 #game_summary.to_csv('s3://nfl-etl-project-brett/cardinals_game_summary_data.csv')
 #scoring_details.to_csv('s3://nfl-etl-project-brett/cardinals_game_scoring_details.csv')
 
-boxscore_response, scoring_response = get_game_data(game_sample)
-save_game_location(boxscore_response, '../data/persist_variables.json')
+# #save game location
+# boxscore_response, scoring_response = get_game_data(game_sample)
+# save_game_location(boxscore_response, '../data/persist_variables.json')
