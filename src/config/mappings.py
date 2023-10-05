@@ -10,7 +10,7 @@ period_mapping = {
 }
 
 #summary data type mappings
-summary_dtype_mapping = {
+boxscore_dtype_mapping = {
     'game_id': 'object',
     'home_team_id': 'object',
     'away_team_id': 'object',
@@ -18,7 +18,7 @@ summary_dtype_mapping = {
     # 'game_date_id': 'object',
     # 'game_location': 'object',
     # 'away_team': 'object',
-    'home_team': 'object',
+    # 'home_team': 'object',
     'home_q1_score': 'int64',
     'home_q2_score': 'int64',
     'home_q3_score': 'int64',
