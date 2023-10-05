@@ -25,7 +25,7 @@ headers = {
 }
 
 #import mappings for naming and datatypes
-from config.mappings import period_mapping, summary_dtype_mapping, scoring_dtype_mapping
+from config.mappings import period_mapping, boxscore_dtype_mapping, scoring_dtype_mapping
 
 #import game list
 from config.api_variables import game_sample
@@ -172,7 +172,7 @@ def transform_boxscore_data(boxscore_responses):
     boxcore_df = pd.DataFrame(boxscore_data_list)
 
     #map new datatypes
-    boxcore_df = boxcore_df.astype(summary_dtype_mapping)
+    boxcore_df = boxcore_df.astype(boxscore_dtype_mapping)
 
     #convert timestamps
     boxcore_df['away_time_of_possession'] = pd.to_datetime(boxcore_df['away_time_of_possession'], format='%M:%S').dt.time
@@ -239,3 +239,11 @@ def transform_scoring_data(scoring_responses):
 # #save game location
 # boxscore_response, scoring_response = get_game_data(game_sample)
 # save_game_location(boxscore_response, '../data/persist_variables.json')
+
+#test boxscore and scoring data
+# boxscore_response, scoring_response = get_game_data(game_sample)
+# boxscore_df = transform_boxscore_data(boxscore_response)
+# scoring_df = transform_scoring_data(scoring_response)
+
+# boxscore_df.to_csv('../data/Exports/fct_boxscore.csv')
+# scoring_df.to_csv('../data/Exports/fct_scoring.csv')
