@@ -136,7 +136,7 @@ def transform_record_data(records_json, season):
         record_data_list.append(record_dict)
     
     #convert list into dataframe
-    record_df = pd.DataFrame(record_df)
+    record_df = pd.DataFrame(record_data_list)
 
     #change datatypes
     record_df = record_df.astype(record_dtype_mapping)
@@ -149,3 +149,8 @@ def transform_record_data(records_json, season):
 # betting_extract = get_betting_data(game_sample_23)
 # betting_df = transform_betting_data(betting_extract, sportsbook_dict)
 # betting_df.to_csv('../data/Exports/fct_betting.csv')
+
+#test record data
+records_response = get_record_data()
+records_df = transform_record_data(records_response, 2023) #can I find a way to auto calculate season?
+records_df.to_csv('../data/Exports/fct_record.csv')
