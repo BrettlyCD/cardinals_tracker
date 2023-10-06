@@ -225,6 +225,28 @@ def transform_game_data(game_extract_list):
 
     return game_df
 
+def create_dim_date_dataframe(start_date_str, end_date_str):
+    """Take a start and end date in YYYY-MM-DD format and create a dataframe of date dimension for each day in that range."""
+
+    #calculate days in input range
+    start_date = pd.to_datetime(start_date_str)
+    end_date = pd.to_datetime(end_date_str)
+    days_count = (end_date-start_date).days+1
+    
+    date_range = pd.date_range(start_date, periods=days_count, freq='D')
+
+    #create dataframe
+    date_df = pd.DataFrame({'date_id': date_range.strftime('%Y%m%d'),
+                        'full_date': date_range,
+                        'day_of_week': date_range.strftime('%A'),
+                        'day_of_week_num': (date_range.weekday + 1) % 7 +1,
+                        'day_of_month': date_range.day,
+                        'month': date_range.month,
+                        'quarter': date_range.quarter,
+                        'year': date_range.year})
+    
+    return date_df
+
 ###export dataframes for storage
 # score_type_df = create_dim_dataframe(score_type_dict)
 # sportsbook_df = create_dim_dataframe(sportsbook_dict)
