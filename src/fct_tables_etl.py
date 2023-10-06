@@ -72,8 +72,8 @@ def transform_betting_data(betting_extract_list, sportsbook_mapping):
                 #create dictionary to append to list
                 betting_odds = {
                     'game_id': game_id,
-                    'last_update': updated_time,
                     'sportsbook_id': value, #value is the sportsbook ID
+                    'last_update': updated_time,
                     'total_over_under': sportsbook_data['totalOver'],
                     'over_odds': sportsbook_data['totalOverOdds'],
                     'under_odds': sportsbook_data['totalUnderOdds'],
