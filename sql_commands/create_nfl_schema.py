@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # Load .env to get PostgreSQL user login info
 load_dotenv()
 
-# Replace these with your PostgreSQL server and authentication details
+# set postgres access variables
 db_host = 'localhost'
 db_port = '5432'  # Default PostgreSQL port
 db_user = os.getenv('psql_username')
