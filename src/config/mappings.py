@@ -97,7 +97,7 @@ game_dtype_mapping = {
     "game_start_time": 'object',
     "game_location": 'object',
     "game_arena": 'object',
-    "is_neautral_site_flag": 'int64',
+    "is_neutral_site_flag": 'int64',
     "espn_link": 'object',
     "cbs_link": 'object'
 }

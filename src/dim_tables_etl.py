@@ -210,7 +210,7 @@ def transform_game_data(game_extract_list):
             "game_start_time": game['gameTime'],
             "game_location": location,
             "game_arena": arena,
-            "is_neautral_site_flag": neutral_site_flag,
+            "is_neutral_site_flag": neutral_site_flag,
             "espn_link": game['espnLink'],
             "cbs_link": game['cbsLink']
         }
