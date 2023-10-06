@@ -57,8 +57,8 @@ scoring_dtype_mapping = {
     'score_time': 'object',  # convert to datetime in function
     'drive_detail': 'object',
     'score_detail': 'object',
-    'away_team_score': 'int64',
-    'home_team_score': 'int64'
+    'home_team_score': 'int64',
+    'away_team_score': 'int64'
 }
 
 #static dim table data type mappings - id, label

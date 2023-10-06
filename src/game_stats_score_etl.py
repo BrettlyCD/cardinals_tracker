@@ -200,8 +200,8 @@ def transform_scoring_data(scoring_responses):
             "score_time": score[1]['scoreTime'],
             "drive_detail": score[1]['scoreDetails'],
             "score_detail": score[1]['score'],
-            "away_team_score": score[1]['awayScore'],
-            "home_team_score": score[1]['homeScore']
+            "home_team_score": score[1]['homeScore'],
+            "away_team_score": score[1]['awayScore']
         }	
 
         #append to the scoring data list
