@@ -142,7 +142,8 @@ def transform_record_data(records_json, season):
     #change datatypes
     record_df = record_df.astype(record_dtype_mapping)
 
-    #do i need to update last_update to timestamp? currently float type
+    #update updated_datetime to datetime format
+    record_df['updated_datetime'] = pd.to_datetime(record_df['updated_datetime'], format='%Y-%m-%d %H:%M:%S.%f')
 
     return record_df
 
