@@ -270,3 +270,7 @@ def create_dim_date_dataframe(start_date_str, end_date_str):
 # game_extract = get_game_data(game_sample)
 # game_df = transform_game_data(game_extract)
 # game_df.to_csv('../data/Exports/dim_game.csv')
+
+#test date data ETL to simple csv
+#date_df = create_dim_date_dataframe('2022-01-01', '2023-12-31')
+#date_df.to_csv('../data/Exports/dim_date.csv')
