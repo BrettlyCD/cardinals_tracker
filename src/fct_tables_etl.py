@@ -96,7 +96,8 @@ def transform_betting_data(betting_extract_list, sportsbook_mapping):
     #change datatypes
     betting_df = betting_df.astype(betting_dtype_mapping)
 
-    #do i need to update last_update to timestamp? currently float type
+    #update the last update to datetime
+    betting_df['last_update'] = pd.to_datetime(betting_df['last_update'], unit='s')
 
     return betting_df
 
