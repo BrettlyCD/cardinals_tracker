@@ -20,14 +20,14 @@ db_params = {
     'password': '{password}'.format(password=db_password)
 }
 
-def execute_sql(connection, sql_statements):
+def execute_sql(connection, sql_statements, success_message):
     """Input PostgreSQL connection and sql statements to run against your database."""
     try:
         cursor = connection.cursor()
         for sql in sql_statements:
             cursor.execute(sql)
         connection.commit()
-        print("Tables created successfully.")
+        print(success_message)
     except Exception as e:
         print(f"Error: {str(e)}")
         connection.rollback()
@@ -256,7 +256,7 @@ add_foreign_keys_sql = [
 #create tables
 try:
     conn1 = psycopg2.connect(**db_params)
-    execute_sql(connection=conn1, sql_statements=create_table_sql)
+    execute_sql(connection=conn1, sql_statements=create_table_sql, success_message='Tables created successfully.')
 except Exception as e:
     print(f"Database error: {str(e)}")
 finally:
@@ -269,7 +269,7 @@ time.sleep(5)
 #alter tables to add foreign key references
 try:
     conn2 = psycopg2.connect(**db_params)
-    execute_sql(connection=conn2, sql_statements=add_foreign_keys_sql)
+    execute_sql(connection=conn2, sql_statements=add_foreign_keys_sql, success_message='Foreign key dependencies added.')
     
 except Exception as e:
     print(f"Database error: {str(e)}")
