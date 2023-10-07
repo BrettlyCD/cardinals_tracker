@@ -38,7 +38,7 @@ def execute_sql(connection, sql_statements):
 create_table_sql = [
     """
     -- Create fct_scoring table in 'nfl' schema
-    CREATE TABLE nfl.fct_scoring IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.fct_scoring (
         score_id serial PRIMARY KEY NOT NULL,
         game_id varchar(16) NOT NULL,
         team_id smallint NOT NULL,
@@ -56,7 +56,7 @@ create_table_sql = [
 
     """
     -- Create fct_record table in 'nfl' schema
-    CREATE TABLE nfl.fct_record IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.fct_record (
         record_id serial PRIMARY KEY NOT NULL,
         team_id smallint NOT NULL,
         updated_datetime timestamp,
@@ -71,7 +71,7 @@ create_table_sql = [
 
     """
     -- Create fct_boxscore table in 'nfl' schema
-    CREATE TABLE nfl.fct_boxscore IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.fct_boxscore (
         boxscore_id serial PRIMARY KEY NOT NULL,
         game_id varchar(16) NOT NULL UNIQUE,
         home_team_id smallint NOT NULL,
@@ -106,7 +106,7 @@ create_table_sql = [
 
     """
     -- Create fct_betting table in 'nfl' schema
-    CREATE TABLE nfl.fct_betting IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.fct_betting (
         odds_id serial PRIMARY KEY NOT NULL,
         game_id varchar(16) NOT NULL,
         sportsbook_id smallint NOT NULL,
@@ -125,7 +125,7 @@ create_table_sql = [
 
     """
     -- Create dim_team table in 'nfl' schema
-    CREATE TABLE nfl.dim_team IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.dim_team (
         team_id smallint PRIMARY KEY NOT NULL,
         team_name_location varchar(50),
         team_name varchar(50),
@@ -136,7 +136,7 @@ create_table_sql = [
 
     """
     -- Create dim_sportsbook table in 'nfl' schema
-    CREATE TABLE nfl.dim_sportsbook IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.dim_sportsbook (
         sportsbook_id smallint PRIMARY KEY NOT NULL,
         sportsbook_name varchar(50) NOT NULL
     );
@@ -144,7 +144,7 @@ create_table_sql = [
 
     """
     -- Create dim_score_type table in 'nfl' schema
-    CREATE TABLE nfl.dim_score_type IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.dim_score_type (
         score_type_id smallint PRIMARY KEY NOT NULL,
         score_type varchar(50) NOT NULL
     );
@@ -152,7 +152,7 @@ create_table_sql = [
 
     """
     -- Create dim_schedule table in 'nfl' schema
-    CREATE TABLE nfl.dim_schedule IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.dim_schedule (
         schedule_id serial PRIMARY KEY NOT NULL,
         game_id varchar(16) NOT NULL,
         team_id smallint NOT NULL,
@@ -166,7 +166,7 @@ create_table_sql = [
 
     """
     -- Create dim_game table in 'nfl' schema
-    CREATE TABLE nfl.dim_game IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.dim_game (
         game_id varchar(16) PRIMARY KEY NOT NULL,
         game_date_id smallint NOT NULL,
         game_type_id smallint NOT NULL,
@@ -183,7 +183,7 @@ create_table_sql = [
 
     """
     -- Create dim_game_type table in 'nfl' schema
-    CREATE TABLE nfl.dim_game_type IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.dim_game_type (
         game_type_id smallint PRIMARY KEY NOT NULL,
         game_type varchar(50) NOT NULL
     );
@@ -191,7 +191,7 @@ create_table_sql = [
 
     """
     -- Create dim_date table in 'nfl' schema
-    CREATE TABLE nfl.dim_date IF NOT EXISTS (
+    CREATE TABLE IF NOT EXISTS nfl.dim_date (
         date_id smallint PRIMARY KEY NOT NULL,
         full_date date,
         day_of_week varchar(10),
