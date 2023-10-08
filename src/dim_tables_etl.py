@@ -1,7 +1,13 @@
+###################################################
+#              IMPORTS   
+###################################################
+
 import pandas as pd
 import json
 import os
 import requests
+import datetime
+import psycopg2
 
 from dotenv import load_dotenv
 from config.dim_tables_static import score_type_dict, sportsbook_dict, game_type_dict #import static dimension data for database update
@@ -9,6 +15,10 @@ from config.mappings import static_dim_dtype_mapping, team_dtype_mapping, schedu
 
 #import team sample to use for tests
 from config.api_variables import team_sample, game_sample
+
+###################################################
+#              SETUP VARIABLES   
+###################################################
 
 #get API Key and Host
 load_dotenv()
@@ -28,6 +38,24 @@ game_endpoint = 'https://tank01-nfl-live-in-game-real-time-statistics-nfl.p.rapi
 
 #set static API querystrings - I'll set dynamic endpoints in the functions themselves
 team_querystring = {'rosters':'false','schedules':'false','topPerformers':'false','teamStats':'false'}
+
+#set postgres access variables
+db_host = 'localhost'
+db_user = os.getenv('psql_username')
+db_password = os.getenv('psql_password')
+db_name = 'team_flow'
+
+#put connection details into params variable
+db_params = {
+    'host': '{host}'.format(host=db_host),
+    'database': '{database}'.format(database=db_name),  
+    'user': '{user}'.format(user=db_user),
+    'password': '{password}'.format(password=db_password)
+}
+
+###################################################
+#              ETL FUNCTIONS   
+###################################################
 
 def create_dim_dataframe(dim_dict):
     """Convert input dictionary for static table into a pandas dataframe"""
@@ -246,6 +274,51 @@ def create_dim_date_dataframe(start_date_str, end_date_str):
                         'year': date_range.year})
     
     return date_df
+
+def load_to_postgres(dataframe_to_load, target_table):
+    """Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
+    Input the target table in 'schema.table' format.
+    """
+
+    #save column names to a list
+    column_names = dataframe_to_load.columns.tolist()
+
+    #create empty list to store insert statements
+    insert_statements = []
+
+    #iterate through dataframe to create a list of INSERT SQL statements to run
+    for index, row in dataframe_to_load.iterrows():
+        values = ', '.join([f"'{val}'" if isinstance(val, (str, datetime.datetime)) and not pd.isna(val) else 'NULL' if pd.isna(val) else str(val) for val in row]) #have some adjustments here to get into the correct format based on values
+        insert_statement = f"INSERT INTO {target_table} ({', '.join(column_names)}) VALUES ({values});"
+        insert_statements.append(insert_statement)
+    
+    #make load to database
+    try:
+        #setup connection and cursor
+        conn = psycopg2.connect(**db_params)
+        cursor = conn.cursor()
+
+        #insert data
+        for sql in insert_statements:
+            cursor.execute(sql)
+
+        #commit changes
+        conn.commit()
+
+        count = len(insert_statements)
+        print(count, "records inserted successfully into {schema_table} table".format(schema_table=target_table))
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error: {error}")
+
+    finally:
+        # Close the cursor and connection
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
 
 ###export dataframes for storage
 # score_type_df = create_dim_dataframe(score_type_dict)
