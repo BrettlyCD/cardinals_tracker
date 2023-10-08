@@ -68,7 +68,10 @@ def create_dim_dataframe(dim_dict, label_column_name, id_column_name):
     #Reorder to put ID first
     df = df[[id_column_name, label_column_name]]
 
-    df = df.astype(static_dim_dtype_mapping)
+    df = df.astype({
+        id_column_name: 'int64',
+        label_column_name: 'object'
+    })
 
     return df
 
@@ -326,11 +329,11 @@ def load_to_postgres(dataframe_to_load, target_table):
 
 
 #load manually created tables into PostgreSQL
-score_type_df = create_dim_dataframe(score_type_dict)
-sportsbook_df = create_dim_dataframe(sportsbook_dict)
-game_type_df = create_dim_dataframe(game_type_dict)
+score_type_df = create_dim_dataframe(score_type_dict, 'score_type', 'score_type_id')
+sportsbook_df = create_dim_dataframe(sportsbook_dict, 'sportsbook_name', 'sportsbook_id')
+game_type_df = create_dim_dataframe(game_type_dict, 'game_type', 'game_type_id')
 
-print(score_type_df.columns)
+print(score_type_df.columns.to_list())
 
 # load_to_postgres(score_type_df, 'nfl.dim_score_type')
 # load_to_postgres(sportsbook_df, 'nfl.dim_sportsbook')

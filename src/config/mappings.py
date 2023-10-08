@@ -61,12 +61,6 @@ scoring_dtype_mapping = {
     'away_team_score': 'int64'
 }
 
-#static dim table data type mappings - id, label
-static_dim_dtype_mapping = {
-    'ID': 'int64',
-    'label': 'object'
-}
-
 #team data type mappings
 team_dtype_mapping = {
     'team_id': 'int64',
