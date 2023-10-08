@@ -11,7 +11,7 @@ import psycopg2
 
 from dotenv import load_dotenv
 from config.dim_tables_static import score_type_dict, sportsbook_dict, game_type_dict #import static dimension data for database update
-from config.mappings import static_dim_dtype_mapping, team_dtype_mapping, schedule_dtype_mapping, game_dtype_mapping
+from config.mappings import team_dtype_mapping, schedule_dtype_mapping, game_dtype_mapping
 
 #import team sample to use for tests
 from config.api_variables import team_sample, game_sample
