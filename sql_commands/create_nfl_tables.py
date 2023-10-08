@@ -157,7 +157,7 @@ create_table_sql = [
         game_id varchar(16) NOT NULL,
         team_id smallint NOT NULL,
         game_type_id smallint NOT NULL,
-        season smallint,
+        season bigint,
         game_week varchar(50),
         is_home_team_flag smallint,
         is_complete_flag smallint
@@ -168,7 +168,7 @@ create_table_sql = [
     -- Create dim_game table in 'nfl' schema
     CREATE TABLE IF NOT EXISTS nfl.dim_game (
         game_id varchar(16) PRIMARY KEY NOT NULL,
-        game_date_id smallint NOT NULL,
+        game_date_id bigint NOT NULL,
         game_type_id smallint NOT NULL,
         home_team_id smallint NOT NULL,
         away_team_id smallint NOT NULL,
@@ -192,14 +192,14 @@ create_table_sql = [
     """
     -- Create dim_date table in 'nfl' schema
     CREATE TABLE IF NOT EXISTS nfl.dim_date (
-        date_id smallint PRIMARY KEY NOT NULL,
+        date_id bigint PRIMARY KEY NOT NULL,
         full_date date,
         day_of_week varchar(10),
         day_of_week_num smallint,
         day_of_month smallint,
         month smallint,
         quarter smallint,
-        year smallint
+        year bigint
     );
     """
 ]
