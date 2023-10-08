@@ -173,7 +173,7 @@ def transform_schedule_data(schedule_extract_list):
             #check for incorrect gameID and update it
             game_id = game['gameID']
             if game_id == '20221121_ARI@SF':
-                game_id = '20221121_SF@ARI'
+                pass
 
             #create dictionary for team data
             if game['home'] == team:
