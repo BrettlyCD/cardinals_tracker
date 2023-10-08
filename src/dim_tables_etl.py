@@ -112,6 +112,28 @@ def transform_team_data(teams_json):
 
     return teams_df
 
+def create_dim_date_dataframe(start_date_str, end_date_str):
+    """Take a start and end date in YYYY-MM-DD format and create a dataframe of date dimension for each day in that range."""
+
+    #calculate days in input range
+    start_date = pd.to_datetime(start_date_str)
+    end_date = pd.to_datetime(end_date_str)
+    days_count = (end_date-start_date).days+1
+    
+    date_range = pd.date_range(start_date, periods=days_count, freq='D')
+
+    #create dataframe
+    date_df = pd.DataFrame({'date_id': date_range.strftime('%Y%m%d'),
+                        'full_date': date_range,
+                        'day_of_week': date_range.strftime('%A'),
+                        'day_of_week_num': (date_range.weekday + 1) % 7 +1,
+                        'day_of_month': date_range.day,
+                        'month': date_range.month,
+                        'quarter': date_range.quarter,
+                        'year': date_range.year})
+    
+    return date_df
+
 def get_schedule_data(team_list, season):
     """Pull Schedule data from Rapid API, using dynamic team list to pull for multiple teams."""
     
@@ -259,28 +281,6 @@ def transform_game_data(game_extract_list):
 
     return game_df
 
-def create_dim_date_dataframe(start_date_str, end_date_str):
-    """Take a start and end date in YYYY-MM-DD format and create a dataframe of date dimension for each day in that range."""
-
-    #calculate days in input range
-    start_date = pd.to_datetime(start_date_str)
-    end_date = pd.to_datetime(end_date_str)
-    days_count = (end_date-start_date).days+1
-    
-    date_range = pd.date_range(start_date, periods=days_count, freq='D')
-
-    #create dataframe
-    date_df = pd.DataFrame({'date_id': date_range.strftime('%Y%m%d'),
-                        'full_date': date_range,
-                        'day_of_week': date_range.strftime('%A'),
-                        'day_of_week_num': (date_range.weekday + 1) % 7 +1,
-                        'day_of_month': date_range.day,
-                        'month': date_range.month,
-                        'quarter': date_range.quarter,
-                        'year': date_range.year})
-    
-    return date_df
-
 def load_to_postgres(dataframe_to_load, target_table):
     """Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
     Input the target table in 'schema.table' format.
@@ -288,7 +288,6 @@ def load_to_postgres(dataframe_to_load, target_table):
 
     #save column names to a list
     column_names = dataframe_to_load.columns.tolist()
-    print(column_names)
 
     #create empty list to store insert statements
     insert_statements = []
@@ -329,20 +328,18 @@ def load_to_postgres(dataframe_to_load, target_table):
 
 
 #load manually created tables into PostgreSQL
-score_type_df = create_dim_dataframe(score_type_dict, 'score_type', 'score_type_id')
-sportsbook_df = create_dim_dataframe(sportsbook_dict, 'sportsbook_name', 'sportsbook_id')
-game_type_df = create_dim_dataframe(game_type_dict, 'game_type', 'game_type_id')
-
-print(score_type_df.columns.to_list())
+# score_type_df = create_dim_dataframe(score_type_dict, 'score_type', 'score_type_id')
+# sportsbook_df = create_dim_dataframe(sportsbook_dict, 'sportsbook_name', 'sportsbook_id')
+# game_type_df = create_dim_dataframe(game_type_dict, 'game_type', 'game_type_id')
 
 # load_to_postgres(score_type_df, 'nfl.dim_score_type')
 # load_to_postgres(sportsbook_df, 'nfl.dim_sportsbook')
 # load_to_postgres(game_type_df, 'nfl.dim_game_type')
 
-#test team data ETL to simple csv
+#load team data ETL to simple csv
 # teams_json = get_team_data()
 # teams_df = transform_team_data(teams_json)
-# teams_df.to_csv('../data/Exports/dim_team.csv')
+# load_to_postgres(teams_df, 'nfl.dim_team')
 
 #test schedule data ETL to simple csv
 # schedule_extract = get_schedule_data(team_sample, 2022)
