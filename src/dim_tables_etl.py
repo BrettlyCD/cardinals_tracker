@@ -57,13 +57,16 @@ db_params = {
 #              ETL FUNCTIONS   
 ###################################################
 
-def create_dim_dataframe(dim_dict):
-    """Convert input dictionary for static table into a pandas dataframe"""
+def create_dim_dataframe(dim_dict, label_column_name, id_column_name):
+    """Convert input dictionary for static table into a pandas dataframe.
+    Enter column names as strings. 'label_column_name example' = 'game_type_name'
+    'id_column_name' example = 'game_type_id'
+    """
 
     #Convert imported dictionary into a pandas dataframe
-    df = pd.DataFrame(dim_dict.items(), columns=[['label', 'ID']])
+    df = pd.DataFrame(dim_dict.items(), columns=[label_column_name, id_column_name])
     #Reorder to put ID first
-    df = df[['ID','label']]
+    df = df[[id_column_name, label_column_name]]
 
     df = df.astype(static_dim_dtype_mapping)
 
@@ -282,6 +285,7 @@ def load_to_postgres(dataframe_to_load, target_table):
 
     #save column names to a list
     column_names = dataframe_to_load.columns.tolist()
+    print(column_names)
 
     #create empty list to store insert statements
     insert_statements = []
@@ -320,14 +324,17 @@ def load_to_postgres(dataframe_to_load, target_table):
 
 
 
-###export dataframes for storage
-# score_type_df = create_dim_dataframe(score_type_dict)
-# sportsbook_df = create_dim_dataframe(sportsbook_dict)
-# game_type_df = create_dim_dataframe(game_type_dict)
 
-# score_type_df.to_csv('../data/Exports/dim_score_type.csv')
-# sportsbook_df.to_csv('../data/Exports/dim_sportsbook.csv')
-# game_type_df.to_csv('../data/Exports/dim_game_type.csv')
+#load manually created tables into PostgreSQL
+score_type_df = create_dim_dataframe(score_type_dict)
+sportsbook_df = create_dim_dataframe(sportsbook_dict)
+game_type_df = create_dim_dataframe(game_type_dict)
+
+print(score_type_df.columns)
+
+# load_to_postgres(score_type_df, 'nfl.dim_score_type')
+# load_to_postgres(sportsbook_df, 'nfl.dim_sportsbook')
+# load_to_postgres(game_type_df, 'nfl.dim_game_type')
 
 #test team data ETL to simple csv
 # teams_json = get_team_data()
