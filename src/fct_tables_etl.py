@@ -153,6 +153,6 @@ def transform_record_data(records_json, season):
 # betting_df.to_csv('../data/Exports/fct_betting.csv')
 
 #test record data
-records_response = get_record_data()
-records_df = transform_record_data(records_response, 2023) #can I find a way to auto calculate season?
-records_df.to_csv('../data/Exports/fct_record.csv')
+# records_response = get_record_data()
+# records_df = transform_record_data(records_response, 2023) #can I find a way to auto calculate season?
+# records_df.to_csv('../data/Exports/fct_record.csv')
