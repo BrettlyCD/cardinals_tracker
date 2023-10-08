@@ -134,79 +134,6 @@ def create_dim_date_dataframe(start_date_str, end_date_str):
     
     return date_df
 
-def get_schedule_data(team_list, season):
-    """Pull Schedule data from Rapid API, using dynamic team list to pull for multiple teams."""
-    
-    #setup empty lsit for saving schedule data
-    schedule_extract_list = []
-
-    #loop through each team and save data
-    for team in team_list:
-        #set querystring
-        schedule_querystring = {"teamID":"{team_id}".format(team_id=team),"season":"{season}".format(season=season)}
-
-        #call API
-        schedule_response = requests.get(schedule_endpoint, headers=headers, params=schedule_querystring)
-
-        #drill to team and schedule 
-        team = schedule_response.json()['body']['team'] #use this flag if team is home team
-        schedule = schedule_response.json()['body']['schedule']
-
-        #combine these variables and append to our extract list
-        schedule_extract_list.append([team, season, schedule])
-
-    return schedule_extract_list
-
-def transform_schedule_data(schedule_extract_list):
-    """Take the output of our get_schedule_data function and transform into a useable dataframe"""   
-
-    #setup empty list to store schedule data
-    schedule_data_list = []
-
-    for item in schedule_extract_list:
-        #set team and season value
-        team = item[0] #take the first item in the sublist
-        season = item[1] #take the second item in the sublist
-        #now loop through each game
-        for game in item[2]: #take the third item in the sublist
-
-            #check for incorrect gameID and update it
-            game_id = game['gameID']
-            if game_id == '20221121_ARI@SF':
-                pass
-
-            #create dictionary for team data
-            if game['home'] == team:
-                schedule_info = {
-                    "game_id": game_id,
-                    "team_id": game['teamIDHome'],
-                    "game_type_id": game_type_dict.get(game['seasonType'], ""),
-                    "season": season, #can I find a way to automate this?
-                    "game_week": game['gameWeek'],
-                    "is_home_team_flag": 1,
-                    "is_complete_flag": 1
-                }
-            else:
-                schedule_info = {
-                    "game_id": game_id,
-                    "team_id": game['teamIDAway'],
-                    "game_type_id": game_type_dict.get(game['seasonType'], ""),
-                    "season": season, #can I find a way to automate this?
-                    "game_week": game['gameWeek'],
-                    "is_home_team_flag": 0,
-                    "is_complete_flag": 1
-                }
-        
-            schedule_data_list.append(schedule_info)
-
-    #convert list into dataframe
-    schedule_df = pd.DataFrame(schedule_data_list)
-
-    #change datatypes
-    schedule_df = schedule_df.astype(schedule_dtype_mapping)
-
-    return schedule_df
-
 def get_game_data(game_list):
     """Take a list of game_ids as input and pull the game data from the Rapid API"""
 
@@ -287,6 +214,79 @@ def transform_game_data(game_extract_list):
 
     return game_df
 
+def get_schedule_data(team_list, season):
+    """Pull Schedule data from Rapid API, using dynamic team list to pull for multiple teams."""
+    
+    #setup empty lsit for saving schedule data
+    schedule_extract_list = []
+
+    #loop through each team and save data
+    for team in team_list:
+        #set querystring
+        schedule_querystring = {"teamID":"{team_id}".format(team_id=team),"season":"{season}".format(season=season)}
+
+        #call API
+        schedule_response = requests.get(schedule_endpoint, headers=headers, params=schedule_querystring)
+
+        #drill to team and schedule 
+        team = schedule_response.json()['body']['team'] #use this flag if team is home team
+        schedule = schedule_response.json()['body']['schedule']
+
+        #combine these variables and append to our extract list
+        schedule_extract_list.append([team, season, schedule])
+
+    return schedule_extract_list
+
+def transform_schedule_data(schedule_extract_list):
+    """Take the output of our get_schedule_data function and transform into a useable dataframe"""   
+
+    #setup empty list to store schedule data
+    schedule_data_list = []
+
+    for item in schedule_extract_list:
+        #set team and season value
+        team = item[0] #take the first item in the sublist
+        season = item[1] #take the second item in the sublist
+        #now loop through each game
+        for game in item[2]: #take the third item in the sublist
+
+            #check for incorrect gameID and update it
+            game_id = game['gameID']
+            if game_id == '20221121_ARI@SF':
+                pass
+
+            #create dictionary for team data
+            if game['home'] == team:
+                schedule_info = {
+                    "game_id": game_id,
+                    "team_id": game['teamIDHome'],
+                    "game_type_id": game_type_dict.get(game['seasonType'], ""),
+                    "season": season, #can I find a way to automate this?
+                    "game_week": game['gameWeek'],
+                    "is_home_team_flag": 1,
+                    "is_complete_flag": 1
+                }
+            else:
+                schedule_info = {
+                    "game_id": game_id,
+                    "team_id": game['teamIDAway'],
+                    "game_type_id": game_type_dict.get(game['seasonType'], ""),
+                    "season": season, #can I find a way to automate this?
+                    "game_week": game['gameWeek'],
+                    "is_home_team_flag": 0,
+                    "is_complete_flag": 1
+                }
+        
+            schedule_data_list.append(schedule_info)
+
+    #convert list into dataframe
+    schedule_df = pd.DataFrame(schedule_data_list)
+
+    #change datatypes
+    schedule_df = schedule_df.astype(schedule_dtype_mapping)
+
+    return schedule_df
+
 def load_to_postgres(dataframe_to_load, target_table):
     """Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
     Input the target table in 'schema.table' format.
@@ -330,9 +330,6 @@ def load_to_postgres(dataframe_to_load, target_table):
         if conn:
             conn.close()
 
-
-
-
 #load manually created tables into PostgreSQL
 # score_type_df = create_dim_dataframe(score_type_dict, 'score_type', 'score_type_id')
 # sportsbook_df = create_dim_dataframe(sportsbook_dict, 'sportsbook_name', 'sportsbook_id')
@@ -352,11 +349,11 @@ def load_to_postgres(dataframe_to_load, target_table):
 # load_to_postgres(date_df, 'nfl.dim_date')
 
 #load game data into PostgreSQL
-game_extract = get_game_data(game_list)
-game_df = transform_game_data(game_extract)
-load_to_postgres(game_df, 'nfl.dim_game')
+# game_extract = get_game_data(game_list)
+# game_df = transform_game_data(game_extract)
+# load_to_postgres(game_df, 'nfl.dim_game')
 
-#load schedule data into PostgreSQL
-schedule_extract = get_schedule_data(team_sample, 2022)
-schedule_df = transform_schedule_data(schedule_extract)
-load_to_postgres(schedule_df, 'nfl.dim_schedule')
+# #load schedule data into PostgreSQL
+# schedule_extract = get_schedule_data(team_sample, 2022)
+# schedule_df = transform_schedule_data(schedule_extract)
+# load_to_postgres(schedule_df, 'nfl.dim_schedule')
