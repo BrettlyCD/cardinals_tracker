@@ -14,7 +14,7 @@ from config.dim_tables_static import score_type_dict, sportsbook_dict, game_type
 from config.mappings import team_dtype_mapping, schedule_dtype_mapping, game_dtype_mapping
 
 #import team sample to use for tests
-from config.api_variables import team_sample, game_sample
+from config.api_variables import team_sample, game_list
 
 ###################################################
 #              SETUP VARIABLES   
@@ -169,10 +169,16 @@ def transform_schedule_data(schedule_extract_list):
         season = item[1] #take the second item in the sublist
         #now loop through each game
         for game in item[2]: #take the third item in the sublist
+
+            #check for incorrect gameID and update it
+            game_id = game['gameID']
+            if game_id == '20221121_ARI@SF':
+                game_id = '20221121_SF@ARI'
+
             #create dictionary for team data
             if game['home'] == team:
                 schedule_info = {
-                    "game_id": game['gameID'],
+                    "game_id": game_id,
                     "team_id": game['teamIDHome'],
                     "game_type_id": game_type_dict.get(game['seasonType'], ""),
                     "season": season, #can I find a way to automate this?
@@ -182,7 +188,7 @@ def transform_schedule_data(schedule_extract_list):
                 }
             else:
                 schedule_info = {
-                    "game_id": game['gameID'],
+                    "game_id": game_id,
                     "team_id": game['teamIDAway'],
                     "game_type_id": game_type_dict.get(game['seasonType'], ""),
                     "season": season, #can I find a way to automate this?
@@ -336,21 +342,21 @@ def load_to_postgres(dataframe_to_load, target_table):
 # load_to_postgres(sportsbook_df, 'nfl.dim_sportsbook')
 # load_to_postgres(game_type_df, 'nfl.dim_game_type')
 
-#load team data ETL to simple csv
+#load team data into PostgreSQL
 # teams_json = get_team_data()
 # teams_df = transform_team_data(teams_json)
 # load_to_postgres(teams_df, 'nfl.dim_team')
 
-#test schedule data ETL to simple csv
-# schedule_extract = get_schedule_data(team_sample, 2022)
-# schedule_df = transform_schedule_data(schedule_extract)
-# schedule_df.to_csv('../data/Exports/dim_schedule.csv')
+#load date data into PostgreSQL
+# date_df = create_dim_date_dataframe('2022-01-01', '2023-12-31')
+# load_to_postgres(date_df, 'nfl.dim_date')
 
-# #test game data now that we have some location data saved
-# game_extract = get_game_data(game_sample)
-# game_df = transform_game_data(game_extract)
-# game_df.to_csv('../data/Exports/dim_game.csv')
+#load game data into PostgreSQL
+game_extract = get_game_data(game_list)
+game_df = transform_game_data(game_extract)
+load_to_postgres(game_df, 'nfl.dim_game')
 
-#test date data ETL to simple csv
-#date_df = create_dim_date_dataframe('2022-01-01', '2023-12-31')
-#date_df.to_csv('../data/Exports/dim_date.csv')
+#load schedule data into PostgreSQL
+schedule_extract = get_schedule_data(team_sample, 2022)
+schedule_df = transform_schedule_data(schedule_extract)
+load_to_postgres(schedule_df, 'nfl.dim_schedule')
