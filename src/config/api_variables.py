@@ -14,7 +14,8 @@ game_list = [
     '20221030_ARI@MIN',
     '20221106_SEA@ARI',
     '20221113_ARI@LAR',
-    '20221121_SF@ARI',
+    '20221121_ARI@SF',
+    #'20221121_SF@ARI', #need to fix this - this one is correct
     '20221127_LAC@ARI',
     '20221212_NE@ARI',
     '20221218_ARI@DEN',
