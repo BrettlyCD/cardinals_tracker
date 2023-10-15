@@ -391,6 +391,6 @@ def load_to_postgres(dataframe_to_load, target_schema, target_table, db_paramete
 # load_to_postgres(game_df, 'nfl', 'dim_game', db_params)
 
 # #load schedule data into PostgreSQL
-schedule_extract = get_schedule_data(team_sample, 2022)
-schedule_df = transform_schedule_data(schedule_extract)
-load_to_postgres(schedule_df, 'nfl', 'dim_schedule', db_params)
+# schedule_extract = get_schedule_data(team_sample, 2022)
+# schedule_df = transform_schedule_data(schedule_extract)
+# load_to_postgres(schedule_df, 'nfl', 'dim_schedule', db_params)
