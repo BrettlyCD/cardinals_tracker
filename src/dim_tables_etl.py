@@ -315,8 +315,8 @@ def transform_schedule_data(schedule_extract_list):
     return schedule_df
 
 def load_to_postgres(dataframe_to_load, target_schema, target_table, db_parameters=db_params):
-    """Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
-    Input the target table in 'schema.table' format.
+    """
+    Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
     """
 
     #save column names to a list
