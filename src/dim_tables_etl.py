@@ -57,7 +57,27 @@ db_params = {
 #              SQL HELPER FUNCTIONS
 ###################################################
 
+# Establish a connection to the PostgreSQL database
+def check_game_ids(db_parameters, column_name='game_id'):   
+    try:
+        #setup connection and cursor
+        conn = psycopg2.connect(**db_parameters)
+        cursor = conn.cursor() 
 
+        # Define the SQL query to retrieve unique game IDs
+        query = f"SELECT DISTINCT {column_name} FROM {table_name};"
+    
+    # Execute the query
+    cursor.execute(query)
+    
+    # Fetch all the unique game IDs and store them in a list
+    unique_game_ids = [row[0] for row in cursor.fetchall()]
+    
+    # Close the cursor and the database connection
+    cursor.close()
+    conn.close()
+    
+    return unique_game_ids
 
 
 ###################################################
@@ -294,7 +314,7 @@ def transform_schedule_data(schedule_extract_list):
 
     return schedule_df
 
-def load_to_postgres(dataframe_to_load, target_table, db_parameters=db_params):
+def load_to_postgres(dataframe_to_load, target_schema, target_table, db_parameters=db_params):
     """Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
     Input the target table in 'schema.table' format.
     """
@@ -308,7 +328,7 @@ def load_to_postgres(dataframe_to_load, target_table, db_parameters=db_params):
     #iterate through dataframe to create a list of INSERT SQL statements to run
     for index, row in dataframe_to_load.iterrows():
         values = ', '.join([f"'{val}'" if isinstance(val, (str, datetime.datetime)) and not pd.isna(val) else 'NULL' if pd.isna(val) else str(val) for val in row]) #have some adjustments here to get into the correct format based on values
-        insert_statement = f"INSERT INTO {target_table} ({', '.join(column_names)}) VALUES ({values});"
+        insert_statement = f"INSERT INTO {target_schema}.{target_table} ({', '.join(column_names)}) VALUES ({values});"
         insert_statements.append(insert_statement)
     
     #make load to database
