@@ -25,6 +25,36 @@ def pandas_game_time_calc(row):
             
         return ((quarter - 1) * 15 * 60) + row['period_elapsed_time']
     
+def get_unique_ids(db_parameters, schema_name='nfl', table_name='dim_game', column_name='game_id'):   
+    """
+    Pull down a set of unique values from any field in a postgres database. Use it to validate foreign key values.
+    """
+    try:
+        #setup connection and cursor
+        conn = psycopg2.connect(**db_parameters)
+        cursor = conn.cursor() 
+
+        # Define the SQL query to retrieve unique game IDs
+        query = f"SELECT DISTINCT {column_name} FROM {schema_name}.{table_name};"
+    
+        # Execute the query
+        cursor.execute(query)
+        
+        # Fetch all the unique game IDs and store them in a list
+        unique_game_ids = {row[0] for row in cursor.fetchall()}
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error: {error}")
+    
+    finally:
+        # Close the cursor and connection
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    
+    return unique_game_ids
+
 def load_to_postgres(dataframe_to_load, target_schema, target_table, db_parameters):
     """
     Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
@@ -70,4 +100,5 @@ def load_to_postgres(dataframe_to_load, target_schema, target_table, db_paramete
 
 if __name__ == '__main__':
     pandas_game_time_calc()
+    get_unique_ids()
     load_to_postgres()
