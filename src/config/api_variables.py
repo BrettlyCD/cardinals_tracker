@@ -28,6 +28,11 @@ game_sample = [
     '20220918_ARI@LV',
 ]
 
+game_sample_23 = [
+    '20231009_CIN@ARI',
+    '20231016_ARI@LAR',
+]
+
 team_list = [
     '1',
     '2',
