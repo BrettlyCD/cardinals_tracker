@@ -278,18 +278,16 @@ def transform_scoring_data(scoring_responses):
 
     return scoring_df
 
-#save dataframes to S3
-#game_summary.to_csv('s3://nfl-etl-project-brett/cardinals_game_summary_data.csv')
-#scoring_details.to_csv('s3://nfl-etl-project-brett/cardinals_game_scoring_details.csv')
+#Extract boxscore and scoring data
+boxscore_response, scoring_response = get_game_data(game_sample)
 
-# #save game location
-# boxscore_response, scoring_response = get_game_data(game_sample)
-# save_game_location(boxscore_response, '../data/persist_variables.json')
+#Save location data
+save_game_location(boxscore_response, '../data/persist_variables.json')
 
-#test boxscore and scoring data
-# boxscore_response, scoring_response = get_game_data(game_sample)
-# boxscore_df = transform_boxscore_data(boxscore_response)
-# scoring_df = transform_scoring_data(scoring_response)
+#transform boxscore and scoring data
+boxscore_df = transform_boxscore_data(boxscore_response)
+scoring_df = transform_scoring_data(scoring_response)
 
-# boxscore_df.to_csv('../data/Exports/fct_boxscore.csv')
-# scoring_df.to_csv('../data/Exports/fct_scoring.csv')
+#load to Postgres
+load_to_postgres(boxscore_df, 'nfl', 'fct_boxscore', db_params)
+load_to_postgres(scoring_df, 'nfl', 'fct_scoring', db_params)
