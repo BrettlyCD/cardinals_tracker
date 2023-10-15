@@ -16,6 +16,9 @@ from config.mappings import team_dtype_mapping, schedule_dtype_mapping, game_dty
 #import team sample to use for tests
 from config.api_variables import team_sample, game_list, game_sample_23
 
+#import functions
+from config.functions import get_unique_ids, load_to_postgres
+
 ###################################################
 #              SETUP VARIABLES   
 ###################################################
@@ -52,39 +55,6 @@ db_params = {
     'user': '{user}'.format(user=db_user),
     'password': '{password}'.format(password=db_password)
 }
-
-###################################################
-#              SQL HELPER FUNCTIONS
-###################################################
-
-# Establish a connection to the PostgreSQL database
-def get_unique_ids(db_parameters, schema_name='nfl', table_name='dim_game', column_name='game_id'):   
-    try:
-        #setup connection and cursor
-        conn = psycopg2.connect(**db_parameters)
-        cursor = conn.cursor() 
-
-        # Define the SQL query to retrieve unique game IDs
-        query = f"SELECT DISTINCT {column_name} FROM {schema_name}.{table_name};"
-    
-        # Execute the query
-        cursor.execute(query)
-        
-        # Fetch all the unique game IDs and store them in a list
-        unique_game_ids = {row[0] for row in cursor.fetchall()}
-
-    except (Exception, psycopg2.Error) as error:
-        print(f"Error: {error}")
-    
-    finally:
-        # Close the cursor and connection
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-    
-    return unique_game_ids
-
 
 ###################################################
 #              ETL FUNCTIONS   
@@ -323,49 +293,6 @@ def transform_schedule_data(schedule_extract_list):
     schedule_df = schedule_df.astype(schedule_dtype_mapping)
 
     return schedule_df
-
-def load_to_postgres(dataframe_to_load, target_schema, target_table, db_parameters=db_params):
-    """
-    Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
-    """
-
-    #save column names to a list
-    column_names = dataframe_to_load.columns.tolist()
-
-    #create empty list to store insert statements
-    insert_statements = []
-
-    #iterate through dataframe to create a list of INSERT SQL statements to run
-    for index, row in dataframe_to_load.iterrows():
-        values = ', '.join([f"'{val}'" if isinstance(val, (str, datetime.datetime)) and not pd.isna(val) else 'NULL' if pd.isna(val) else str(val) for val in row]) #have some adjustments here to get into the correct format based on values
-        insert_statement = f"INSERT INTO {target_schema}.{target_table} ({', '.join(column_names)}) VALUES ({values});"
-        insert_statements.append(insert_statement)
-    
-    #make load to database
-    try:
-        #setup connection and cursor
-        conn = psycopg2.connect(**db_parameters)
-        cursor = conn.cursor()
-
-        #insert data
-        for sql in insert_statements:
-            cursor.execute(sql)
-
-        #commit changes
-        conn.commit()
-
-        count = len(insert_statements)
-        print(count, "records inserted successfully into {schema_table} table".format(schema_table=target_table))
-
-    except (Exception, psycopg2.Error) as error:
-        print(f"Error: {error}")
-
-    finally:
-        # Close the cursor and connection
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 #load manually created tables into PostgreSQL
 # score_type_df = create_dim_dataframe(score_type_dict, 'score_type', 'score_type_id')
