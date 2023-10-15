@@ -1,3 +1,7 @@
+###################################################
+#              IMPORTS   
+###################################################
+
 import pandas as pd
 import numpy as np
 import os
@@ -7,8 +11,20 @@ from datetime import datetime
 import s3fs
 
 from dotenv import load_dotenv
-from config.functions import pandas_game_time_calc
+
+#import mappings for naming and datatypes
+from config.mappings import period_mapping, boxscore_dtype_mapping, scoring_dtype_mapping
+
+#import game list and lookup variables
+from config.api_variables import game_sample
 from config.dim_tables_static import score_type_dict
+
+#import functions
+from config.functions import pandas_game_time_calc, load_to_postgres
+
+###################################################
+#              SETUP VARIABLES   
+###################################################
 
 #get API Key and Host
 load_dotenv()
@@ -24,14 +40,24 @@ headers = {
 	"X-RapidAPI-Host": "{host}".format(host=api_host)
 }
 
-#import mappings for naming and datatypes
-from config.mappings import period_mapping, boxscore_dtype_mapping, scoring_dtype_mapping
+#set postgres access variables
+db_host = 'localhost'
+db_user = os.getenv('psql_username')
+db_password = os.getenv('psql_password')
+db_name = 'team_flow'
 
-#import game list
-from config.api_variables import game_sample
+#put connection details into params variable
+db_params = {
+    'host': '{host}'.format(host=db_host),
+    'database': '{database}'.format(database=db_name),  
+    'user': '{user}'.format(user=db_user),
+    'password': '{password}'.format(password=db_password)
+}
 
-###API PULLS###
-#define steps into multiple functions
+###################################################
+#              SETUP VARIABLES   
+###################################################
+
 def get_game_data(game_list):
     """Pull data from NFL Rapid API and save to lists for transformation"""
     #setup empty lists to store json data
