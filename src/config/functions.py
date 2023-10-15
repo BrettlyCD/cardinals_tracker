@@ -6,7 +6,8 @@
 
 import pandas as pd
 import psycopg2
-from datetime import datetime
+from datetime import datetime, time
+
 
 ###################################################
 #              FUNCTIONS   
@@ -102,7 +103,7 @@ def load_to_postgres(dataframe_to_load, target_schema, target_table, db_paramete
 
     #iterate through dataframe to create a list of INSERT SQL statements to run
     for index, row in dataframe_to_load.iterrows():
-        values = ', '.join([f"'{val}'" if isinstance(val, (str, datetime)) and not pd.isna(val) else 'NULL' if pd.isna(val) else str(val) for val in row]) #have some adjustments here to get into the correct format based on values
+        values = ', '.join([f"'{val}'" if isinstance(val, (str, datetime, time)) and not pd.isna(val) else 'NULL' if pd.isna(val) else str(val) for val in row]) #have some adjustments here to get into the correct format based on values
         insert_statement = f"INSERT INTO {target_schema}.{target_table} ({', '.join(column_names)}) VALUES ({values});"
         insert_statements.append(insert_statement)
     
