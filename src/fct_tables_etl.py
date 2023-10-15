@@ -98,7 +98,6 @@ def transform_betting_data(betting_extract_list):
 
     #load in sportsbook ids and names to iterate through
     sportsbook_mapping = get_dimension_dict(db_params, 'nfl', 'dim_sportsbook', 'sportsbook_id', 'sportsbook_name')
-    print(sportsbook_mapping)
 
     #loop through extract of game odds
     for odds in betting_extract_list:
@@ -144,7 +143,6 @@ def transform_betting_data(betting_extract_list):
 
     #convert list into dataframe
     betting_df = pd.DataFrame(betting_data_list)
-    print(betting_df)
 
     #change datatypes
     betting_df = betting_df.astype(betting_dtype_mapping)
@@ -203,6 +201,8 @@ def transform_record_data(records_json, season):
 #load betting data into PostgreSQL
 betting_extract = get_betting_data(game_sample_23)
 betting_df = transform_betting_data(betting_extract)
+load_to_postgres(betting_df, 'nfl', 'fct_betting', db_params)
+
 
 
 #test record data
