@@ -58,24 +58,30 @@ db_params = {
 ###################################################
 
 # Establish a connection to the PostgreSQL database
-def check_game_ids(db_parameters, column_name='game_id'):   
+def get_unique_ids(db_parameters, schema_name='nfl', table_name='dim_game', column_name='game_id'):   
     try:
         #setup connection and cursor
         conn = psycopg2.connect(**db_parameters)
         cursor = conn.cursor() 
 
         # Define the SQL query to retrieve unique game IDs
-        query = f"SELECT DISTINCT {column_name} FROM {table_name};"
+        query = f"SELECT DISTINCT {column_name} FROM {schema_name}.{table_name};"
     
-    # Execute the query
-    cursor.execute(query)
+        # Execute the query
+        cursor.execute(query)
+        
+        # Fetch all the unique game IDs and store them in a list
+        unique_game_ids = {row[0] for row in cursor.fetchall()}
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error: {error}")
     
-    # Fetch all the unique game IDs and store them in a list
-    unique_game_ids = [row[0] for row in cursor.fetchall()]
-    
-    # Close the cursor and the database connection
-    cursor.close()
-    conn.close()
+    finally:
+        # Close the cursor and connection
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
     
     return unique_game_ids
 
@@ -362,25 +368,32 @@ def load_to_postgres(dataframe_to_load, target_schema, target_table, db_paramete
 # sportsbook_df = create_dim_dataframe(sportsbook_dict, 'sportsbook_name', 'sportsbook_id')
 # game_type_df = create_dim_dataframe(game_type_dict, 'game_type', 'game_type_id')
 
-# load_to_postgres(score_type_df, 'nfl.dim_score_type')
-# load_to_postgres(sportsbook_df, 'nfl.dim_sportsbook')
-# load_to_postgres(game_type_df, 'nfl.dim_game_type')
+# load_to_postgres(score_type_df, 'nfl', 'dim_score_type', db_params)
+# load_to_postgres(sportsbook_df, 'nfl', 'dim_sportsbook', db_params)
+# load_to_postgres(game_type_df, 'nfl', 'dim_game_type', db_params)
 
-#load team data into PostgreSQL
+# #load team data into PostgreSQL
 # teams_json = get_team_data()
 # teams_df = transform_team_data(teams_json)
-# load_to_postgres(teams_df, 'nfl.dim_team')
+# load_to_postgres(teams_df, 'nfl', 'dim_team', db_params)
 
-#load date data into PostgreSQL
+# #load date data into PostgreSQL
 # date_df = create_dim_date_dataframe('2022-01-01', '2023-12-31')
-# load_to_postgres(date_df, 'nfl.dim_date')
+# load_to_postgres(date_df, 'nfl', 'dim_date', db_params)
 
-#load game data into PostgreSQL
+# #load game data into PostgreSQL
 # game_extract = get_game_data(game_list)
 # game_df = transform_game_data(game_extract)
-# load_to_postgres(game_df, 'nfl.dim_game')
+# load_to_postgres(game_df, 'nfl', 'dim_game', db_params)
 
+#pull game IDs to validate they exist before loading schedule
+unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
+test_id = '20221121_ARI@SF'
+if test_id in unique_game_ids:
+    print(f"{test_id} is in the set.")
+else:
+    print(f"{test_id} is not in the set.")
 # #load schedule data into PostgreSQL
 # schedule_extract = get_schedule_data(team_sample, 2022)
 # schedule_df = transform_schedule_data(schedule_extract)
-# load_to_postgres(schedule_df, 'nfl.dim_schedule')
+# load_to_postgres(schedule_df, 'nfl', 'dim_schedule', db_params)
