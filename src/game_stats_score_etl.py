@@ -17,10 +17,9 @@ from config.mappings import period_mapping, boxscore_dtype_mapping, scoring_dtyp
 
 #import game list and lookup variables
 from config.api_variables import game_sample
-from config.dim_tables_static import score_type_dict
 
 #import functions
-from config.functions import pandas_game_time_calc, get_unique_ids, load_to_postgres
+from config.functions import pandas_game_time_calc, get_unique_ids, get_dimension_dict, load_to_postgres
 
 ###################################################
 #              SETUP VARIABLES   
@@ -226,7 +225,12 @@ def transform_scoring_data(scoring_responses):
     for score in scoring_responses:
         #use mapping to get score period and score_type_id into correct format
         score_period = period_mapping.get(score[1]['scorePeriod'], score[1]['scorePeriod']) #have to add the 1 index to pull the score details, 0 is the game ID
-        score_type_id = score_type_dict.get(score[1]['scoreType'], '') #get the ID of the score type or blank if not exists
+        score_type_dict = get_dimension_dict(db_params, 'nfl', 'dim_score_type', 'score_type_id', 'score_type')
+        for key, value in score_type_dict.items():
+            if value == score[1]['scoreType']:
+                score_type_id = key
+                break
+        #score_type_dict.get_key(score[1]['scoreType'], '') #get the ID of the score type or blank if not exists
 
         #check for incorrect gameID
         #pull all game_ids in database into a set
