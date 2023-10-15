@@ -199,13 +199,11 @@ def transform_record_data(records_json, season):
     return record_df
 
 #load betting data into PostgreSQL
-betting_extract = get_betting_data(game_sample_23)
-betting_df = transform_betting_data(betting_extract)
-load_to_postgres(betting_df, 'nfl', 'fct_betting', db_params)
+# betting_extract = get_betting_data(game_sample_23)
+# betting_df = transform_betting_data(betting_extract)
+# load_to_postgres(betting_df, 'nfl', 'fct_betting', db_params)
 
-
-
-#test record data
+#load record data into PostgreSQL
 # records_response = get_record_data()
 # records_df = transform_record_data(records_response, 2023) #can I find a way to auto calculate season?
-# records_df.to_csv('../data/Exports/fct_record.csv')
+# load_to_postgres(records_df, 'nfl', 'fct_record', db_params)
