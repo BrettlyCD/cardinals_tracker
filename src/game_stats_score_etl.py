@@ -20,7 +20,7 @@ from config.api_variables import game_sample
 from config.dim_tables_static import score_type_dict
 
 #import functions
-from config.functions import pandas_game_time_calc, load_to_postgres
+from config.functions import pandas_game_time_calc, get_unique_ids, load_to_postgres
 
 ###################################################
 #              SETUP VARIABLES   
@@ -65,9 +65,18 @@ def get_game_data(game_list):
     scoring_responses = []
 
     #loop through game list and pull down game data
-    for game in game_list:
+    for game_id in game_list:
+
+        #check for incorrect gameID
+        #pull all game_ids in database into a set
+        unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
+
+        #check if it exists in the database before loading
+        if game_id not in unique_game_ids:
+            continue
+
         #setup querystring for API endpoint
-        querystring = {"gameID":"{game_id}".format(game_id=game),"fantasyPoints":"false"}
+        querystring = {"gameID":"{game_id}".format(game_id=game_id),"fantasyPoints":"false"}
         
         #call using predefined headers and querystring
         response = requests.get(url, headers=headers, params=querystring)
@@ -81,7 +90,7 @@ def get_game_data(game_list):
         #loop through scoring events in each game
         for score in boxscore['scoringPlays']:
             #create a sub_list with the gameID and scoring details
-            score_sub_list = [game, score]
+            score_sub_list = [game_id, score]
             #append score detail to scoring list
             scoring_responses.append(score_sub_list)
 
@@ -134,6 +143,15 @@ def transform_boxscore_data(boxscore_responses):
     #loop through API responses to populate data
     for boxscore in boxscore_responses:
 
+        #check for incorrect gameID
+        #pull all game_ids in database into a set
+        unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
+
+        #save gameid and updated time as a variable and check if it exists
+        game_id = boxscore['gameID']
+        if game_id not in unique_game_ids:
+            continue
+
         #set home team win flag value
         if boxscore['homeResult'] == 'W':
             home_win_flag = 1
@@ -141,13 +159,9 @@ def transform_boxscore_data(boxscore_responses):
             home_win_flag = 0
 
         game_summary = {
-            "game_id": boxscore['gameID'],
+            "game_id": game_id,
             "home_team_id": boxscore['lineScore']['home']['teamID'],
             "away_team_id": boxscore['lineScore']['away']['teamID'],
-            # "game_type": boxscore['seasonType'],
-            # "game_date_id": boxscore['gameDate'],
-            # "game_location": boxscore['gameLocation'],
-            # "away_team": boxscore['away'],
             "home_q1_score": boxscore['lineScore']['home']['Q1'],
             "home_q2_score": boxscore['lineScore']['home']['Q2'],
             "home_q3_score": boxscore['lineScore']['home']['Q3'],
@@ -173,9 +187,6 @@ def transform_boxscore_data(boxscore_responses):
             "away_turnovers": boxscore['teamStats']['away']['turnovers'],
             "away_time_of_possession": boxscore['teamStats']['away']['possession'],
             "home_team_win_flag": home_win_flag
-            # "away_result": boxscore['awayResult'],
-            # "home_team": boxscore['home'],
-            # "home_result": boxscore['homeResult']
         }
 
         #try to access the 'OT' field and set the value if it exists, if not set OT score to 0
@@ -216,6 +227,15 @@ def transform_scoring_data(scoring_responses):
         #use mapping to get score period and score_type_id into correct format
         score_period = period_mapping.get(score[1]['scorePeriod'], score[1]['scorePeriod']) #have to add the 1 index to pull the score details, 0 is the game ID
         score_type_id = score_type_dict.get(score[1]['scoreType'], '') #get the ID of the score type or blank if not exists
+
+        #check for incorrect gameID
+        #pull all game_ids in database into a set
+        unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
+
+        #save gameid and updated time as a variable and check if it exists
+        game_id = score[0]
+        if game_id not in unique_game_ids:
+            continue
 
         #create dictionary for scoring details
         score_detail = {
