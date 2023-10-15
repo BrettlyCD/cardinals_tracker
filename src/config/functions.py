@@ -55,6 +55,40 @@ def get_unique_ids(db_parameters, schema_name='nfl', table_name='dim_game', colu
     
     return unique_game_ids
 
+def get_dimension_dict(db_parameters, schema_name, table_name, column1_name, column2_name):
+    """
+    Pull down distinct values from two columns in a postgres database. Use the output to build a dictionary of unique id-values combos to use in python functions.
+    """
+    try:
+        #setup connection and cursor
+        conn = psycopg2.connect(**db_parameters)
+        cursor = conn.cursor() 
+
+        # Define the SQL query to retrieve unique game IDs
+        query = f"SELECT DISTINCT {column1_name}, {column2_name} FROM {schema_name}.{table_name};"
+    
+        # Execute the query
+        cursor.execute(query)
+        
+        # Fetch all rows and convert them into a list of dictionaries
+        result_dict = {}
+        for row in cursor.fetchall():
+            field1, field2 = row
+            result_dict[field1] = field2
+        
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error: {error}")
+    
+    finally:
+        # Close the cursor and connection
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    
+    return result_dict
+
 def load_to_postgres(dataframe_to_load, target_schema, target_table, db_parameters):
     """
     Take dataframe created in transform step and load the data into the target_table in a PostgreSQL database.
@@ -101,4 +135,5 @@ def load_to_postgres(dataframe_to_load, target_schema, target_table, db_paramete
 if __name__ == '__main__':
     pandas_game_time_calc()
     get_unique_ids()
+    get_dimension_dict()
     load_to_postgres()
