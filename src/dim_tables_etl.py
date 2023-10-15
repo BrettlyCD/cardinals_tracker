@@ -14,7 +14,7 @@ from config.dim_tables_static import score_type_dict, sportsbook_dict, game_type
 from config.mappings import team_dtype_mapping, schedule_dtype_mapping, game_dtype_mapping
 
 #import team sample to use for tests
-from config.api_variables import team_sample, game_list
+from config.api_variables import team_sample, game_list, game_sample_23
 
 ###################################################
 #              SETUP VARIABLES   
@@ -386,11 +386,13 @@ def load_to_postgres(dataframe_to_load, target_schema, target_table, db_paramete
 # load_to_postgres(date_df, 'nfl', 'dim_date', db_params)
 
 # #load game data into PostgreSQL
-# game_extract = get_game_data(game_list)
+# game_extract = get_game_data(game_sample_23)
 # game_df = transform_game_data(game_extract)
 # load_to_postgres(game_df, 'nfl', 'dim_game', db_params)
 
-# #load schedule data into PostgreSQL
-# schedule_extract = get_schedule_data(team_sample, 2022)
+# # #load schedule data into PostgreSQL
+# schedule_extract = get_schedule_data(team_sample, 2023)
 # schedule_df = transform_schedule_data(schedule_extract)
 # load_to_postgres(schedule_df, 'nfl', 'dim_schedule', db_params)
+
+##maybe need to change this to an upsert?
