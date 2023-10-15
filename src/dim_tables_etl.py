@@ -283,10 +283,14 @@ def transform_schedule_data(schedule_extract_list):
         #now loop through each game
         for game in item[2]: #take the third item in the sublist
 
-            #check for incorrect gameID and update it
+            #check for incorrect gameID
+            #pull all game_ids in database into a set
+            unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
+
+            #check if game is in set, if it is continue, if not - skip to the next iteration
             game_id = game['gameID']
-            if game_id == '20221121_ARI@SF':
-                pass
+            if game_id not in unique_game_ids:
+                continue
 
             #create dictionary for team data
             if game['home'] == team:
@@ -386,14 +390,7 @@ def load_to_postgres(dataframe_to_load, target_schema, target_table, db_paramete
 # game_df = transform_game_data(game_extract)
 # load_to_postgres(game_df, 'nfl', 'dim_game', db_params)
 
-#pull game IDs to validate they exist before loading schedule
-unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
-test_id = '20221121_ARI@SF'
-if test_id in unique_game_ids:
-    print(f"{test_id} is in the set.")
-else:
-    print(f"{test_id} is not in the set.")
 # #load schedule data into PostgreSQL
-# schedule_extract = get_schedule_data(team_sample, 2022)
-# schedule_df = transform_schedule_data(schedule_extract)
-# load_to_postgres(schedule_df, 'nfl', 'dim_schedule', db_params)
+schedule_extract = get_schedule_data(team_sample, 2022)
+schedule_df = transform_schedule_data(schedule_extract)
+load_to_postgres(schedule_df, 'nfl', 'dim_schedule', db_params)
