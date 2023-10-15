@@ -29,8 +29,8 @@ game_sample = [
 ]
 
 game_sample_23 = [
-    '20231009_CIN@ARI',
-    '20231016_ARI@LAR',
+    '20231008_CIN@ARI',
+    '20231015_ARI@LAR',
 ]
 
 team_list = [
