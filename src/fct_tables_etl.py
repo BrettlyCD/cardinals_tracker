@@ -1,13 +1,27 @@
+###################################################
+#              IMPORTS   
+###################################################
+
 import pandas as pd
 import json
 import os
 import requests
+import datetime
 from datetime import datetime
 
 from dotenv import load_dotenv
-from config.dim_tables_static import sportsbook_dict
+
+#load in dtype mappings and game list to load
+#from config.dim_tables_static import sportsbook_dict
 from config.mappings import betting_dtype_mapping, record_dtype_mapping
-from config.api_variables import game_sample_23
+from config.api_variables import game_sample, game_sample_23
+
+#load in functions
+from config.functions import get_unique_ids, get_dimension_dict, load_to_postgres
+
+###################################################
+#              SETUP VARIABLES   
+###################################################
 
 #get API Key and Host
 load_dotenv()
@@ -27,6 +41,24 @@ record_endpoint = 'https://tank01-nfl-live-in-game-real-time-statistics-nfl.p.ra
 #set static querystring
 record_querystring = {'rosters':'false','schedules':'false','topPerformers':'false','teamStats':'false'}
 
+#set postgres access variables
+db_host = 'localhost'
+db_user = os.getenv('psql_username')
+db_password = os.getenv('psql_password')
+db_name = 'team_flow'
+
+#put connection details into params variable
+db_params = {
+    'host': '{host}'.format(host=db_host),
+    'database': '{database}'.format(database=db_name),  
+    'user': '{user}'.format(user=db_user),
+    'password': '{password}'.format(password=db_password)
+}
+
+###################################################
+#              ETL Functions  
+###################################################
+
 def get_betting_data(game_list):
     """Loop through list of games and get data from Rapid API"""
 
@@ -35,6 +67,14 @@ def get_betting_data(game_list):
 
     #loop through list and call API
     for game_id in game_list:
+
+        #check for incorrect gameID
+        #pull all game_ids in database into a set
+        unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
+
+        #check if it exists in the database before loading
+        if game_id not in unique_game_ids:
+            continue
 
         #set querystring
         betting_querystring = {'gameID':'{game_id}'.format(game_id=game_id)}
@@ -50,29 +90,41 @@ def get_betting_data(game_list):
     
     return betting_extract_list
 
-def transform_betting_data(betting_extract_list, sportsbook_mapping):
+def transform_betting_data(betting_extract_list):
     """Take in extract from get_betting_data function and our sportsbook ID mapping dictionary and build useable dataframe"""
 
     #set empty list to save betting data
     betting_data_list = []
 
+    #load in sportsbook ids and names to iterate through
+    sportsbook_mapping = get_dimension_dict(db_params, 'nfl', 'dim_sportsbook', 'sportsbook_id', 'sportsbook_name')
+    print(sportsbook_mapping)
+
     #loop through extract of game odds
     for odds in betting_extract_list:
 
-        #save gameid and updated time as a variable
+        #check for incorrect gameID
+        #pull all game_ids in database into a set
+        unique_game_ids = get_unique_ids(db_parameters=db_params, schema_name='nfl', table_name='dim_game', column_name='game_id')
+
+        #save gameid and updated time as a variable and check if it exists
         game_id = odds[0] #the first index is the gameID
+        if game_id not in unique_game_ids:
+            continue
+
+        #save the updated time as a variable
         updated_time = odds[1]['last_updated_e_time'] #the second index holds the odds data
 
         #now loop through all of our known sportsbook in the mapping dictionary. If there is a match - create a record, if not - pass
         for key, value in sportsbook_mapping.items():
             try: 
                 #drill into sportsbook
-                sportsbook_data = odds[1]['{sportsbook}'.format(sportsbook=key)] #key = sportsbook name
+                sportsbook_data = odds[1]['{sportsbook}'.format(sportsbook=value)] #key = sportsbook name
 
                 #create dictionary to append to list
                 betting_odds = {
                     'game_id': game_id,
-                    'sportsbook_id': value, #value is the sportsbook ID
+                    'sportsbook_id': key, #value is the sportsbook ID
                     'last_update': updated_time,
                     'total_over_under': sportsbook_data['totalOver'],
                     'over_odds': sportsbook_data['totalOverOdds'],
@@ -92,6 +144,7 @@ def transform_betting_data(betting_extract_list, sportsbook_mapping):
 
     #convert list into dataframe
     betting_df = pd.DataFrame(betting_data_list)
+    print(betting_df)
 
     #change datatypes
     betting_df = betting_df.astype(betting_dtype_mapping)
@@ -147,10 +200,10 @@ def transform_record_data(records_json, season):
 
     return record_df
 
-#test betting data
-# betting_extract = get_betting_data(game_sample_23)
-# betting_df = transform_betting_data(betting_extract, sportsbook_dict)
-# betting_df.to_csv('../data/Exports/fct_betting.csv')
+#load betting data into PostgreSQL
+betting_extract = get_betting_data(game_sample_23)
+betting_df = transform_betting_data(betting_extract)
+
 
 #test record data
 # records_response = get_record_data()
