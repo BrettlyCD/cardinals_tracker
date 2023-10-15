@@ -14,13 +14,18 @@ game_list = [
     '20221030_ARI@MIN',
     '20221106_SEA@ARI',
     '20221113_ARI@LAR',
-    '20221121_SF@ARI', #this one is correct need to work on fix for schedule data
+    '20221121_SF@ARI',
     '20221127_LAC@ARI',
     '20221212_NE@ARI',
     '20221218_ARI@DEN',
     '20221225_TB@ARI',
     '20230101_ARI@ATL',
     '20230108_ARI@SF',
+    '20230910_ARI@WAS',
+    '20230917_NYG@ARI',
+    '20230924_DAL@ARI',
+    '20231001_ARI@SF',
+    '20231008_CIN@ARI'
 ]
 
 game_sample = [
